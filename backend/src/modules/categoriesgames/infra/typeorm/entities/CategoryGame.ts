@@ -17,7 +17,7 @@ export default class CategoryGame {
   @Column({ type: 'text' })
   value: string;
 
-  @Column({ type: 'integer' })
+  @Column({ type: 'int' })
   value_number: number;
 
   @CreateDateColumn()

@@ -17,7 +17,7 @@ export default class AccountGame {
   @Column({ type: 'text' })
   company: string;
 
-  @Column({ type: 'integer' })
+  @Column({ type: 'int' })
   value_number: number;
 
   @CreateDateColumn()
