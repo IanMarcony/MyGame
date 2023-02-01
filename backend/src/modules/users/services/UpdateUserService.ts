@@ -15,18 +15,15 @@ export default class UpdateUserService {
     private usersRepository: IUserRepository,
   ) {}
 
-  async execute({ name, cpf, id_user }: IRequest): Promise<User> {
-    const checkUserExist = await this.usersRepository.findById(id_user);
+  async execute({ name, id_user }: IRequest): Promise<User> {
+    const user = await this.usersRepository.findById(id_user);
 
-    if (!checkUserExist) {
+    if (!user) {
       throw new AppError('User not exists');
     }
 
-    checkUserExist.name = name;
-    checkUserExist.cpf = cpf;
+    user.name = name;
 
-    const user = await this.usersRepository.update(checkUserExist);
-
-    return user;
+    return await this.usersRepository.update(user);
   }
 }
