@@ -1,5 +1,6 @@
 import AccountGameUser from '@modules/accountgames/infra/typeorm/entities/AccountGameUser';
-import CategoryGameUser from '@modules/categoriesgames/infra/typeorm/entities/CategoryGameUser';
+import Perference from '@modules/categoriesgames/infra/typeorm/entities/Preference';
+import CategoryGameUser from '@modules/categoriesgames/infra/typeorm/entities/Preference';
 import ChatUser from '@modules/chat/infra/typeorm/entities/ChatUser';
 import Post from '@modules/posts/infra/typeorm/entities/Post';
 import {
@@ -48,11 +49,8 @@ export default class User {
   )
   account_games_users: AccountGameUser[];
 
-  @OneToMany(
-    () => CategoryGameUser,
-    (categories_game_users) => categories_game_users.user,
-  )
-  categories_game_users: CategoryGameUser[];
+  @OneToMany(() => Perference, (preferences) => preferences.user)
+  preferences: Perference[];
 
   @OneToMany(() => ChatUser, (chat_users) => chat_users.user_request, {
     cascade: true,

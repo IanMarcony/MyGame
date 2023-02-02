@@ -11,8 +11,8 @@ import {
 } from 'typeorm';
 import CategoryGame from './CategoryGame';
 
-@Entity('categories_game_users')
-export default class CategoryGameUser {
+@Entity('preferences')
+export default class Perference {
   @PrimaryGeneratedColumn()
   id: number;
 
