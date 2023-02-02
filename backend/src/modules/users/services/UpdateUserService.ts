@@ -22,11 +22,10 @@ export default class UpdateUserService {
     birth_date,
     description,
   }: IRequest): Promise<User> {
-    const checkUserExistWithSameName = await this.usersRepository.findByName(
-      name,
-    );
+    const checkUsersExistWithSameName =
+      await this.usersRepository.findAllByName(name);
 
-    if (checkUserExistWithSameName) {
+    if (checkUsersExistWithSameName.length > 1) {
       throw new AppError('Name already exists');
     }
 
