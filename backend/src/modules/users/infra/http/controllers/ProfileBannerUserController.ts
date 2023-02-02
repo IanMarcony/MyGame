@@ -14,12 +14,14 @@ export default class ProfileBannerUserController {
       UpdateProfileAndBannerPhotoService,
     );
 
-    const store = await updateProfileBanner.execute({
+    const user = await updateProfileBanner.execute({
       filename_banner_photo: banner_image.filename,
       filename_profile_photo: profile_image.filename,
       id_user,
     });
 
-    return res.status(200).json(store);
+    delete user.password;
+
+    return res.status(200).json(user);
   }
 }
