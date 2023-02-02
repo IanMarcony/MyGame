@@ -13,10 +13,6 @@ export default class SessionsController {
     delete user.password;
     delete user.id;
 
-    if (!user.is_super_user) {
-      delete user.is_super_user;
-    }
-
     return res.status(201).json({ user, token });
   }
 }
