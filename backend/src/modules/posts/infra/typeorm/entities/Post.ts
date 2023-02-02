@@ -24,7 +24,7 @@ export default class Post {
   @Column({ type: 'boolean' })
   is_private: boolean;
 
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer', default: 0 })
   count_likes: number;
 
   @Column()

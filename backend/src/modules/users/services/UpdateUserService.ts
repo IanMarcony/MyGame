@@ -5,7 +5,8 @@ import { inject, injectable } from 'tsyringe';
 
 interface IRequest {
   name: string;
-  cpf: string;
+  birth_date: Date;
+  description: string;
   id_user: number;
 }
 @injectable()
@@ -15,7 +16,20 @@ export default class UpdateUserService {
     private usersRepository: IUserRepository,
   ) {}
 
-  async execute({ name, id_user }: IRequest): Promise<User> {
+  async execute({
+    name,
+    id_user,
+    birth_date,
+    description,
+  }: IRequest): Promise<User> {
+    const checkUserExistWithSameName = await this.usersRepository.findByName(
+      name,
+    );
+
+    if (checkUserExistWithSameName) {
+      throw new AppError('Name already exists');
+    }
+
     const user = await this.usersRepository.findById(id_user);
 
     if (!user) {
@@ -23,6 +37,8 @@ export default class UpdateUserService {
     }
 
     user.name = name;
+    user.birth_date = birth_date;
+    user.description = description;
 
     return await this.usersRepository.update(user);
   }

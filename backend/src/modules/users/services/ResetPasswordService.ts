@@ -22,6 +22,10 @@ export default class ResetPasswordService {
   ) {}
 
   async execute({ password, token }: IRequest): Promise<void> {
+    if (password.length < 8 || password.length > 16) {
+      throw new AppError('Password length minimum is 8 and maximum is 16.');
+    }
+
     const userToken = await this.userTokensRepository.findByToken(token);
 
     if (!userToken) {

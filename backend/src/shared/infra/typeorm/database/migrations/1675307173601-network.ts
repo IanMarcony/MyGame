@@ -1,9 +1,25 @@
 import AccountGame from '@modules/accountgames/infra/typeorm/entities/AccountGame';
+import ActionUser from '@modules/posts/infra/typeorm/entities/ActionUser';
 import { AppDataSource } from 'data-source';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class network1675265969568 implements MigrationInterface {
+export class network1675307173601 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    await AppDataSource.createQueryBuilder()
+      .insert()
+      .into(ActionUser)
+      .values([
+        {
+          type: 'COMMENT',
+          value: 5,
+        },
+        {
+          type: 'LIKE',
+          value: 4,
+        },
+      ])
+      .execute();
+
     await AppDataSource.createQueryBuilder()
       .insert()
       .into(AccountGame)
@@ -41,5 +57,11 @@ export class network1675265969568 implements MigrationInterface {
       .delete()
       .from(AccountGame)
       .execute();
+
+    await AppDataSource.createQueryBuilder()
+      .delete()
+      .from(ActionUser)
+      .execute();
   }
 }
+

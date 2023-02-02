@@ -29,15 +29,15 @@ export default class User {
   password: string;
 
   @Column({ type: 'datetime' })
-  bith_date: Date;
+  birth_date: Date;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   url_profile_photo: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   url_banner_photo: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   description: string;
 
   @OneToMany(() => Post, (post) => post.user)
