@@ -32,14 +32,12 @@ export default class AuthenticateUserService {
       throw new AppError('Incorrect email/password combination.', 401);
     }
     let passwordMatched = false;
-    if (!user.is_super_user) {
-      passwordMatched = await this.hashProvider.compareHash(
-        password,
-        user.password,
-      );
-    } else {
-      passwordMatched = password === user.password;
-    }
+
+    passwordMatched = await this.hashProvider.compareHash(
+      password,
+      user.password,
+    );
+
     if (!passwordMatched) {
       throw new AppError('Incorrect email/password combination.', 401);
     }

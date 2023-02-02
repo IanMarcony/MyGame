@@ -3,8 +3,10 @@ import User from '../infra/typeorm/entities/User';
 
 export default interface IUsersRepository {
   findById(id: number): Promise<User | null>;
+  findByName(name: string): Promise<User | null>;
+  findAllByName(name: string): Promise<User[]>;
   findByEmail(email: string): Promise<User | null>;
-  findByCPF(cpf: string): Promise<User | null>;
+  findByEmailWithFullProfile(email: string): Promise<User | null>;
   create(data: ICreateUserDTO): Promise<User>;
   update(user: User): Promise<User>;
   delete(user: User): Promise<void>;

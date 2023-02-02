@@ -7,9 +7,9 @@
     "build": "tsc",
     "dev": "ts-node-dev -r tsconfig-paths/register --inspect --transpile-only --ignore-watch node_modules src/shared/infra/http/server.ts",
     "start": "ts-node src/shared/infra/http/server.ts",
-    "migration:create": "typeorm-ts-node-commonjs migration:create ./src/shared/infra/typeorm/database/migrations/store",
-    "migration:generate": "typeorm-ts-node-commonjs -d ./src/data-source.ts migration:generate ./src/shared/infra/typeorm/database/migrations/store",
-    "migration:run": "typeorm-ts-node-commonjs -d ./src/data-source.ts migration:run"
+    "migration:create": "node -r tsconfig-paths/register ./node_modules/typeorm/cli-ts-node-commonjs.js migration:create ./src/shared/infra/typeorm/database/migrations/network",
+    "migration:generate": "node -r tsconfig-paths/register ./node_modules/typeorm/cli-ts-node-commonjs.js -d ./src/data-source.ts migration:generate ./src/shared/infra/typeorm/database/migrations/network",
+    "migration:run": "node -r tsconfig-paths/register ./node_modules/typeorm/cli-ts-node-commonjs.js  -d ./src/data-source.ts migration:run"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
