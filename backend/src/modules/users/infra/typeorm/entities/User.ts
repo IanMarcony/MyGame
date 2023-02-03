@@ -13,6 +13,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import FriendRequest from './FriendRequest';
 
 @Entity('users')
 export default class User {
@@ -42,6 +43,12 @@ export default class User {
 
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
+
+  @OneToMany(
+    () => FriendRequest,
+    (friend_requests) => friend_requests.userRequester,
+  )
+  friendRequests: FriendRequest[];
 
   @OneToMany(
     () => AccountGameUser,
