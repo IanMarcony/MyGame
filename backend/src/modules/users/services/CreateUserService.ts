@@ -3,7 +3,6 @@ import AppError from '@shared/errors/AppError';
 import IUserRepository from '../repositories/IUsersRepository';
 import { inject, injectable } from 'tsyringe';
 import IHashProvider from '../providers/HashProvider/interfaces/IHashProvider';
-import IStorageProvider from '@shared/container/providers/StorageProvider/interfaces/IStorageProvider';
 import IPreferenceRepository from '@modules/categoriesgames/repositories/IPreferenceRepository';
 import IAccountGameUsersRepository from '@modules/accountgames/repositories/IAccountGameUsersRepository';
 

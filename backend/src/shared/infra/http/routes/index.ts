@@ -5,6 +5,8 @@ import sessionsRouter from '@modules/users/infra/http/routes/sessions.routes';
 import passwordRouter from '@modules/users/infra/http/routes/password.routes';
 import accountGameRouter from '@modules/accountgames/infra/http/routes/accountgame.routes';
 import accountGameUserRouter from '@modules/accountgames/infra/http/routes/accountgamesuser.routes';
+import categoriesRouter from '@modules/categoriesgames/infra/http/routes/categorygame.routes';
+import preferencesRouter from '@modules/categoriesgames/infra/http/routes/preferences.routes';
 
 const routes = Router();
 
@@ -13,5 +15,7 @@ routes.use('/sessions', sessionsRouter);
 routes.use('/password', passwordRouter);
 routes.use('/accountgames', accountGameRouter);
 routes.use('/accountgames/users', accountGameUserRouter);
+routes.use('/categoriesgame', categoriesRouter);
+routes.use('/preferences/users', preferencesRouter);
 
 export default routes;

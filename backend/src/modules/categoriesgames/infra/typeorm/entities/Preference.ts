@@ -12,7 +12,7 @@ import {
 import CategoryGame from './CategoryGame';
 
 @Entity('preferences')
-export default class Perference {
+export default class Preference {
   @PrimaryGeneratedColumn()
   id: number;
 

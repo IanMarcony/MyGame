@@ -13,6 +13,8 @@ import IAccountGameUsersRepository from '@modules/accountgames/repositories/IAcc
 import AccountGameUsersRepository from '@modules/accountgames/infra/typeorm/repositories/AccountGameUsersRepository';
 import IAccountGameRepository from '@modules/accountgames/repositories/IAccountGameRepository';
 import AccountGameRepository from '@modules/accountgames/infra/typeorm/repositories/AccountGameRepository';
+import ICategoryGameRepository from '@modules/categoriesgames/repositories/ICategoryGameRepository';
+import CategoryGameRepository from '@modules/categoriesgames/infra/typeorm/repositories/CategoryGameRepository';
 
 container.registerSingleton<IUsersRepository>(
   'UsersRepository',
@@ -27,6 +29,11 @@ container.registerSingleton<IUserTokensRepository>(
 container.registerSingleton<IPreferenceRepository>(
   'PreferencesRepository',
   PreferenceRepository,
+);
+
+container.registerSingleton<ICategoryGameRepository>(
+  'CategoryGameRepository',
+  CategoryGameRepository,
 );
 
 container.registerSingleton<IAccountGameUsersRepository>(
