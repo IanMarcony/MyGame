@@ -10,6 +10,7 @@ import ProtectedRoutes from './ProtectedRoutes';
 const Routes: React.FC = () => {
   return (
     <Switch>
+      <Route path="/" element={<SignIn />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/password/forgot" element={<ForgotPassword />} />
