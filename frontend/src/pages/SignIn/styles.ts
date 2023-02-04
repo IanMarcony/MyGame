@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import { Form } from '@unform/web';
+
 export const Container = styled.div`
   width: 100%;
   display: flex;
@@ -30,7 +32,7 @@ export const SectionSignin = styled.section`
   box-shadow: 1px 2px 8px 0px rgba(0, 0, 0, 0.75);
 `;
 
-export const Form = styled.form`
+export const FormSignin = styled(Form)`
   width: 100%;
   height: 100%;
   display: flex;
