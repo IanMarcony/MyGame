@@ -11,8 +11,13 @@ const SignIn: React.FC = () => {
         <Form>
           <input type="email" placeholder="Email" />
           <input type="password" placeholder="Senha" />
+
+          <Link id="forgot" to="/password/forgot">
+            Esqueci minha senha
+          </Link>
+
           <button type="submit">Entrar</button>
-          <Link to="/signup">Criar conta</Link>
+          <Link to="/signup">Não tem uma conta? Crie agora</Link>
         </Form>
       </SectionSignin>
     </Container>

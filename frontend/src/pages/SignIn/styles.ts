@@ -69,6 +69,19 @@ export const Form = styled.form`
     }
   }
 
+  #forgot {
+    padding: 0;
+    display: flex;
+    justify-content: start;
+    background-color: #0000;
+    font-size: 14px;
+    text-decoration: underline;
+
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+
   a {
     width: 50%;
     display: block;
