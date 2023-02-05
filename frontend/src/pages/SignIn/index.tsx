@@ -1,40 +1,44 @@
 import React, { useCallback, useState } from 'react';
-import { Link, redirect } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
+import { FiLogIn, FiMail, FiLock } from 'react-icons/fi';
+import Input from '../../components/Input';
 
 import { useAuth } from '../../hooks/auth';
 
 import { Container, FormSignin, SectionSignin } from './styles';
 
-const SignIn: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { signIn } = useAuth();
+interface ILoginState {
+  email: string;
+  password: string;
+}
 
-  const handleSignIn = useCallback(async () => {
-    try {
-      await signIn({ email, password });
-      return redirect('/dashboard');
-    } catch (e) {
-      return alert('Erro ao processar dados');
-    }
-  }, [signIn, email, password]);
+const SignIn: React.FC = () => {
+  const { signIn, user } = useAuth();
+  const nagivate = useNavigate();
+  const handleSignIn = useCallback(
+    async ({ email, password }: ILoginState) => {
+      try {
+        await signIn({ email, password });
+        return nagivate('/dashboard');
+      } catch (e) {
+        return alert('Erro ao processar dados');
+      }
+    },
+    [signIn, nagivate],
+  );
 
   return (
     <Container>
+      {user && <Navigate to="dashboard" replace />}
       <SectionSignin>
         <h1>Acesse sua conta</h1>
         <FormSignin onSubmit={handleSignIn}>
-          <input
-            type="email"
-            placeholder="Email"
-            defaultValue={email}
-            onChange={({ target }) => setEmail(target.value)}
-          />
-          <input
+          <Input name="email" icon={FiMail} type="email" placeholder="Email" />
+          <Input
+            name="password"
+            icon={FiLock}
             type="password"
             placeholder="Senha"
-            defaultValue={password}
-            onChange={({ target }) => setPassword(target.value)}
           />
 
           <Link id="forgot" to="/password/forgot">

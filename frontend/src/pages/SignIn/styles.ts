@@ -33,33 +33,19 @@ export const SectionSignin = styled.section`
 `;
 
 export const FormSignin = styled(Form)`
-  width: 100%;
+  width: 60%;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-top: 50px;
 
-  input {
-    width: 50%;
-    padding: 12px;
-    color: var(--text-color);
-    background-color: var(--background-color);
-    border-radius: 5px;
-    border-width: 0;
-    border-color: var(--text-secondary-color);
-
-    &::placeholder {
-      color: var(--text-color);
-    }
-  }
-
   input + input {
     margin-top: 10px;
   }
 
   button {
-    width: 50%;
+    width: 100%;
     padding: 12px;
     border-radius: 5px;
     margin-top: 12px;
@@ -85,7 +71,7 @@ export const FormSignin = styled(Form)`
   }
 
   a {
-    width: 50%;
+    width: 100%;
     display: block;
     padding: 12px;
     margin-top: 12px;
