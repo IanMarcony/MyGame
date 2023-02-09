@@ -1,6 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
-import { FiLogIn, FiMail, FiLock } from 'react-icons/fi';
+import { FiMail, FiLock } from 'react-icons/fi';
+import * as Yup from 'yup';
 import Input from '../../components/Input';
 
 import { useAuth } from '../../hooks/auth';
@@ -15,10 +16,20 @@ interface ILoginState {
 const SignIn: React.FC = () => {
   const { signIn, user } = useAuth();
   const nagivate = useNavigate();
+
   const handleSignIn = useCallback(
-    async ({ email, password }: ILoginState) => {
+    async (data: ILoginState) => {
       try {
-        await signIn({ email, password });
+        const schema = Yup.object().shape({
+          email: Yup.string()
+            .required('E-mail obrigatório')
+            .email('Digite um e-mail válido'),
+          password: Yup.string().required().min(8),
+        });
+
+        await schema.validate(data, { abortEarly: false });
+
+        await signIn({ email: data.email, password: data.password });
         return nagivate('/dashboard');
       } catch (e) {
         return alert('Erro ao processar dados');
@@ -29,7 +40,7 @@ const SignIn: React.FC = () => {
 
   return (
     <Container>
-      {user && <Navigate to="dashboard" replace />}
+      {user && <Navigate to="/dashboard" replace />}
       <SectionSignin>
         <h1>Acesse sua conta</h1>
         <FormSignin onSubmit={handleSignIn}>

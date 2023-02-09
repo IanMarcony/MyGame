@@ -118,3 +118,35 @@ export const FormSignup = styled(Form)`
     }
   }
 `;
+
+export const InputImagesArea = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-bottom: 10px;
+  justify-content: space-between;
+`;
+
+export const DropImageProfileArea = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background-color);
+  border-radius: 10px;
+  border: 2px solid #232129;
+  padding: 16px;
+  width: 40%;
+  color: var(--text-color);
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+`;
+
+export const ImageProfileArea = styled.div``;
+export const ImageBannerArea = styled.div`
+  width: 200px;
+  height: 90px;
+  img {
+    width: 100%;
+    height: 100%;
+  }
+`;

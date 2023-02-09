@@ -1,5 +1,8 @@
+/* eslint-disable import/no-unresolved */
+/* eslint-disable consistent-return */
+/* eslint-disable radix */
 /* eslint-disable react/no-array-index-key */
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import {
   FiArrowLeft,
   FiBookOpen,
@@ -12,18 +15,32 @@ import Box from '@mui/material/Box';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Chip from '@mui/material/Chip';
 import MenuItem from '@mui/material/MenuItem';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import * as Yup from 'yup';
+import { sub } from 'date-fns';
+import { BsUpload } from 'react-icons/bs';
+import { Avatar } from '@mui/material';
 import Input from '../../components/Input';
 import {
   AccountsContainer,
   Container,
+  DropImageProfileArea,
   FormSignup,
   HeaderSignup,
+  ImageBannerArea,
+  ImageProfileArea,
+  InputImagesArea,
   SectionSignup,
 } from './styles';
+
+import UserIcon from '../../assets/user.png';
+import BannerIcon from '../../assets/banner.jpg';
+
 import DateInput from '../../components/DateInput';
 import api from '../../services/api';
 import AccountInput from '../../components/AccountInput';
+import { useAuth } from '../../hooks/auth';
+import Constants from '../../utils/Constants';
 
 interface ICategoriesGame {
   id: number;
@@ -42,6 +59,26 @@ const SignUp: React.FC = () => {
   const [categoriesGameSelected, setCategoriesGameSelected] = useState<
     string[]
   >([]);
+  const fileImageProfileInput = useRef<HTMLInputElement>(null);
+  const fileImageBannerInput = useRef<HTMLInputElement>(null);
+  const [imageProfile, setImageProfile] = useState<File | null>(() => {
+    return new File([UserIcon], 'user.png', {
+      type: 'image/*',
+    });
+  });
+  const [imageBanner, setImageBanner] = useState<File | null>(() => {
+    return new File([BannerIcon], 'banner.jpg', {
+      type: 'image/*',
+    });
+  });
+  const [previewUrlImageProfile, setPreviewUrlImageProfile] = useState(() => {
+    return UserIcon;
+  });
+  const [previewUrlImageBanner, setPreviewUrlImageBanner] = useState(() => {
+    return BannerIcon;
+  });
+  const { signIn } = useAuth();
+  const nagivate = useNavigate();
 
   const handleRequestBase = useCallback(async () => {
     const [categoriesResponse, accountsResponse] = await Promise.all([
@@ -75,9 +112,153 @@ const SignUp: React.FC = () => {
     [],
   );
 
-  const handleSubmit = useCallback(async (data: any) => {
-    console.log(data);
+  const handleImagesSubmit = useCallback(async () => {
+    if (imageProfile === null || imageBanner === null) {
+      throw new Error('Envio obrigatório de foto e capa');
+    }
+    const token = localStorage.getItem(Constants.storage.token);
+    const config = {
+      headers: {
+        authorization: `Bearer ${token}`,
+        'content-type': 'multipart/form-data',
+      },
+    };
+
+    const formData = new FormData();
+    formData.append('profile_image', imageProfile);
+    formData.append('banner_image', imageBanner);
+
+    await api.patch('/users/images', formData, config);
+
+    return nagivate('/dashboard');
+  }, [imageBanner, imageProfile, nagivate]);
+
+  const handleSubmit = useCallback(
+    async (data: any) => {
+      try {
+        const schema = Yup.object().shape({
+          name: Yup.string().required('Nome obrigatório'),
+          // birth_date: Yup.string().required('Data de nascimento obrigatória'),
+          email: Yup.string()
+            .required('E-mail obrigatório')
+            .email('Digite um e-mail válido'),
+          password: Yup.string().required().min(8),
+          repassword: Yup.string().required().min(8),
+        });
+
+        await schema.validate(data, { abortEarly: false });
+        if (imageProfile === null || imageBanner === null) {
+          throw new Error('Envio obrigatório de foto e capa');
+        }
+        if (data.password !== data.repassword) {
+          throw new Error('As senhas não são iguais');
+        }
+
+        if (categoriesGameSelected.length === 0) {
+          throw new Error('Deve selecionar pelo menos uma preferência');
+        }
+
+        const dateTenYears = sub(new Date(), {
+          years: 10,
+        });
+        const birthDate_aux = new Date(data.birth_date);
+
+        if (birthDate_aux.getFullYear() > dateTenYears.getFullYear()) {
+          throw new Error('Deve ser uma data de pelo menos 10 anos atrás');
+        }
+
+        Object.assign(data, {
+          birth_date: data.birth_date.replaceAll('/', '-'),
+        });
+
+        const preferencesUser = categoriesGameSelected.map((item) => {
+          return {
+            id_category_game: parseInt(item.split('-')[0]),
+          };
+        });
+
+        Object.assign(data, {
+          preferences: preferencesUser,
+        });
+
+        const keysFromDataSubmit = Object.keys(data);
+        const keysAccountsGame = keysFromDataSubmit.filter(
+          (item) => item.includes('account_') && data[item] !== '',
+        );
+
+        const accountsGameUser = keysAccountsGame.map((item) => {
+          return {
+            username: data[item],
+            id_account_game: parseInt(item.split('_')[2]),
+          };
+        });
+
+        Object.assign(data, {
+          accounts_game: accountsGameUser,
+        });
+
+        await api.post('/users', data);
+        await signIn({ email: data.email, password: data.password });
+        handleImagesSubmit();
+      } catch (e) {
+        console.log(`Error: ${e}`);
+      }
+    },
+    [categoriesGameSelected, signIn, handleImagesSubmit],
+  );
+
+  const handleFileProfile = useCallback((file: File | null) => {
+    setImageProfile(file);
+    if (file) {
+      setPreviewUrlImageProfile(URL.createObjectURL(file));
+    }
   }, []);
+
+  const handleFileBanner = useCallback((file: File | null) => {
+    setImageBanner(file);
+    if (file) {
+      setPreviewUrlImageBanner(URL.createObjectURL(file));
+    }
+  }, []);
+  const handleOnDragOver = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+    },
+    [],
+  );
+  const handleOnDropImageProfile = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const imageFile = event.dataTransfer.files[0];
+
+      handleFileProfile(imageFile);
+    },
+    [handleFileProfile],
+  );
+
+  const handleOnDropImageBanner = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const imageFile = event.dataTransfer.files[0];
+
+      handleFileBanner(imageFile);
+    },
+    [handleFileBanner],
+  );
+
+  const handleFileImageProfileClick = useCallback(() => {
+    // eslint-disable-next-line no-unused-expressions
+    fileImageProfileInput.current && fileImageProfileInput.current.click();
+  }, [fileImageProfileInput]);
+
+  const handleFileImageBannerClick = useCallback(() => {
+    // eslint-disable-next-line no-unused-expressions
+    fileImageBannerInput.current && fileImageBannerInput.current.click();
+  }, [fileImageBannerInput]);
 
   useEffect(() => {
     handleRequestBase();
@@ -94,6 +275,60 @@ const SignUp: React.FC = () => {
         </HeaderSignup>
         <FormSignup onSubmit={handleSubmit}>
           <h2>Insira suas informações abaixo</h2>
+          <InputImagesArea>
+            <DropImageProfileArea
+              onDragOver={handleOnDragOver}
+              onDrop={handleOnDropImageProfile}
+              onClick={handleFileImageProfileClick}
+            >
+              {previewUrlImageProfile && (
+                <ImageProfileArea>
+                  <Avatar
+                    alt="Foto de perfil"
+                    src={previewUrlImageProfile}
+                    sx={{ width: 100, height: 100 }}
+                  />
+                </ImageProfileArea>
+              )}
+              <p>
+                Arraste e solte sua foto de perfil <BsUpload />{' '}
+              </p>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileImageProfileInput}
+                hidden
+                onChange={(e) =>
+                  handleFileProfile(e.target.files && e.target.files[0])
+                }
+              />
+            </DropImageProfileArea>
+
+            <DropImageProfileArea
+              onDragOver={handleOnDragOver}
+              onDrop={handleOnDropImageBanner}
+              onClick={handleFileImageBannerClick}
+            >
+              {previewUrlImageBanner && (
+                <ImageBannerArea>
+                  <img alt="Foto de capa" src={previewUrlImageBanner} />
+                </ImageBannerArea>
+              )}
+              <p>
+                Arraste e solte sua foto de capa <BsUpload />{' '}
+              </p>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileImageBannerInput}
+                hidden
+                onChange={(e) =>
+                  handleFileBanner(e.target.files && e.target.files[0])
+                }
+              />
+            </DropImageProfileArea>
+          </InputImagesArea>
+
           <Input name="name" icon={FiUser} type="text" placeholder="Nome" />
           <Input name="email" icon={FiMail} type="email" placeholder="Email" />
           <Input
@@ -116,7 +351,7 @@ const SignUp: React.FC = () => {
             placeholder="Descrição"
           />
 
-          <DateInput name="bith_date" />
+          <DateInput name="birth_date" />
 
           <h2 className="preferences">Agora fale um pouco mais sobre você</h2>
 
@@ -124,14 +359,14 @@ const SignUp: React.FC = () => {
             <>
               <h3>
                 Insira o username das contas de jogos para compartilhar com
-                amigos
+                amigos, se não tiver não se preocupe, não é obrigatório
               </h3>
               <AccountsContainer>
                 {accountGames.map((item) => {
                   return (
                     <AccountInput
                       key={item.id}
-                      name={item.company.toLowerCase()}
+                      name={`account_${item.company.toLowerCase()}_${item.id}`}
                       valueAccount={item}
                       placeholder="Username"
                     />
@@ -149,6 +384,7 @@ const SignUp: React.FC = () => {
                 labelId="demo-multiple-chip-label"
                 id="demo-multiple-chip"
                 multiple
+                placeholder="Selecione suas preferências"
                 defaultValue={[]}
                 value={categoriesGameSelected}
                 onChange={handleChange}
