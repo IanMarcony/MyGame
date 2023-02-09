@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-constructed-context-values */
 /* eslint-disable @typescript-eslint/ban-types */
 
 /* eslint-disable react/prop-types */
@@ -22,6 +23,7 @@ interface SignInCredentials {
 
 interface AuthContextData {
   user: object;
+  token: string;
 
   signIn(credentials: SignInCredentials): Promise<void>;
 
@@ -74,7 +76,9 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user: data.user, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ user: data.user, token: data.token, signIn, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );

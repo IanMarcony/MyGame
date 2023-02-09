@@ -2,16 +2,16 @@ import ICreatePreferenceDTO from '@modules/categoriesgames/dtos/ICreatePreferenc
 import IPreferenceRepository from '@modules/categoriesgames/repositories/IPreferenceRepository';
 import { AppDataSource } from 'data-source';
 import { Repository } from 'typeorm';
-import Perference from '../entities/Preference';
+import Preference from '../entities/Preference';
 
 export default class PreferenceRepository implements IPreferenceRepository {
-  private ormRepository: Repository<Perference>;
+  private ormRepository: Repository<Preference>;
 
   constructor() {
-    this.ormRepository = AppDataSource.getRepository(Perference);
+    this.ormRepository = AppDataSource.getRepository(Preference);
   }
 
-  public async create(datas: ICreatePreferenceDTO[]): Promise<Perference[]> {
+  public async create(datas: ICreatePreferenceDTO[]): Promise<Preference[]> {
     const preferences = this.ormRepository.create(datas);
     await this.ormRepository.save(preferences);
     return preferences;

@@ -3,7 +3,6 @@ import AppError from '@shared/errors/AppError';
 import IUserRepository from '../repositories/IUsersRepository';
 import { inject, injectable } from 'tsyringe';
 import IHashProvider from '../providers/HashProvider/interfaces/IHashProvider';
-import IStorageProvider from '@shared/container/providers/StorageProvider/interfaces/IStorageProvider';
 import IPreferenceRepository from '@modules/categoriesgames/repositories/IPreferenceRepository';
 import IAccountGameUsersRepository from '@modules/accountgames/repositories/IAccountGameUsersRepository';
 
@@ -20,7 +19,7 @@ interface IRequest {
   name: string;
   email: string;
   password: string;
-  birth_date: Date;
+  birth_date: string;
   description: string;
   accounts_game: IAccountGameUser[];
   preferences: IPreference[];
@@ -77,7 +76,7 @@ export default class CreateUserService {
       name,
       email,
       password: hashedPassword,
-      birth_date,
+      birth_date: new Date(birth_date).toISOString(),
       description,
     });
 

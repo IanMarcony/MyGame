@@ -1,34 +1,32 @@
 import { createGlobalStyle } from 'styled-components';
 
 export default createGlobalStyle`
+  :root{
+    --background-color: #454D6B;
+    --background-secondary-color: #353B50;
+    --text-color: #D6D7DC;
+    --text-secondary-color: #FFF8EC;
+    --button-color: #A13854;
+  }
 
   *{
-
     margin:0;
-
     padding:0;
-
     outline:0;
-
     box-sizing:border-box;
-
   }
 
   body{
-
-    background:#ddd;
-
-    color:#000;
-
+    background:var(--background-color);
+    color:var(--text-color);
     -webkit-font-smoothing:antialiased;
+    font-family: 'Roboto', serif;
 
   }
 
   body,input, button{
-
-    font-family: 'Roboto Slab', serif;
-
-    font-size:16px;
+    font-weight: 400;
+    font-size: 16px ;
 
   }
 
@@ -43,5 +41,12 @@ export default createGlobalStyle`
     cursor:pointer;
 
   }
+
+  button{
+    border-width: 0;
+    background-color: var(--button-color) ;
+    color: var(--text-secondary-color);
+  }
+
 
 `;

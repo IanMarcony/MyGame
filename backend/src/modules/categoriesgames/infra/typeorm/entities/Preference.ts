@@ -12,7 +12,7 @@ import {
 import CategoryGame from './CategoryGame';
 
 @Entity('preferences')
-export default class Perference {
+export default class Preference {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,7 +26,7 @@ export default class Perference {
   @JoinColumn({ name: 'id_user' })
   user: User;
 
-  @OneToOne(() => CategoryGame)
+  @ManyToOne(() => CategoryGame)
   @JoinColumn({ name: 'id_category_game' })
   account_game: CategoryGame;
 
