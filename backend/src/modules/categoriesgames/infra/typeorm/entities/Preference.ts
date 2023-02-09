@@ -26,7 +26,7 @@ export default class Preference {
   @JoinColumn({ name: 'id_user' })
   user: User;
 
-  @OneToOne(() => CategoryGame)
+  @ManyToOne(() => CategoryGame)
   @JoinColumn({ name: 'id_category_game' })
   account_game: CategoryGame;
 
