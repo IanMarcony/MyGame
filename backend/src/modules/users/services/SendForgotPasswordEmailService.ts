@@ -25,8 +25,12 @@ export default class SendForgotPasswordEmailService {
       throw new AppError('Email address does not exist');
     }
 
-    await this.userTokensRepository.generate(user.id);
+    const { token } = await this.userTokensRepository.generate(user.id);
 
-    await this.mailProvider.sendMail(email, 'recover your password');
+    await this.mailProvider.sendMail(
+      email,
+      'Recuperação de senha',
+      `<h1>Pedido de troca de senha</h1><br><p>Recebemos uma solicitação de troca de senha, para trocar, acesse o seguinte link: ${process.env.CLIENT_URL}/password/change?token=${token}</p>`,
+    );
   }
 }

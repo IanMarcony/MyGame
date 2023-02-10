@@ -41,15 +41,20 @@ export default class UpdateProfileAndBannerPhotoService {
       await this.storageProvider.deleteFile(user.url_profile_photo);
     }
 
-    const profile_image_filename = await this.storageProvider.saveFile(
-      filename_profile_photo,
-    );
-    const banner_image_filename = await this.storageProvider.saveFile(
-      filename_banner_photo,
-    );
+    if (filename_profile_photo) {
+      const profile_image_filename = await this.storageProvider.saveFile(
+        filename_profile_photo,
+      );
+      user.url_profile_photo = profile_image_filename;
+    }
 
-    user.url_banner_photo = banner_image_filename;
-    user.url_profile_photo = profile_image_filename;
+    if (filename_banner_photo) {
+      const banner_image_filename = await this.storageProvider.saveFile(
+        filename_banner_photo,
+      );
+
+      user.url_banner_photo = banner_image_filename;
+    }
 
     await this.usersRepository.update(user);
 

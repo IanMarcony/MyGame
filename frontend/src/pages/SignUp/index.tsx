@@ -61,23 +61,15 @@ const SignUp: React.FC = () => {
   >([]);
   const fileImageProfileInput = useRef<HTMLInputElement>(null);
   const fileImageBannerInput = useRef<HTMLInputElement>(null);
-  const [imageProfile, setImageProfile] = useState<File | null>(() => {
-    return new File([UserIcon], 'user.png', {
-      type: 'image/*',
-    });
-  });
-  const [imageBanner, setImageBanner] = useState<File | null>(() => {
-    return new File([BannerIcon], 'banner.jpg', {
-      type: 'image/*',
-    });
-  });
+  const [imageProfile, setImageProfile] = useState<File | null>(null);
+  const [imageBanner, setImageBanner] = useState<File | null>(null);
   const [previewUrlImageProfile, setPreviewUrlImageProfile] = useState(() => {
     return UserIcon;
   });
   const [previewUrlImageBanner, setPreviewUrlImageBanner] = useState(() => {
     return BannerIcon;
   });
-  const { signIn } = useAuth();
+  const { signIn, updateUser } = useAuth();
   const nagivate = useNavigate();
 
   const handleRequestBase = useCallback(async () => {
@@ -113,9 +105,6 @@ const SignUp: React.FC = () => {
   );
 
   const handleImagesSubmit = useCallback(async () => {
-    if (imageProfile === null || imageBanner === null) {
-      throw new Error('Envio obrigatório de foto e capa');
-    }
     const token = localStorage.getItem(Constants.storage.token);
     const config = {
       headers: {
@@ -125,13 +114,15 @@ const SignUp: React.FC = () => {
     };
 
     const formData = new FormData();
-    formData.append('profile_image', imageProfile);
-    formData.append('banner_image', imageBanner);
+    formData.append('profile_image', imageProfile || '');
+    formData.append('banner_image', imageBanner || '');
 
-    await api.patch('/users/images', formData, config);
+    const { data: user } = await api.patch('/users/images', formData, config);
+
+    updateUser(user);
 
     return nagivate('/dashboard');
-  }, [imageBanner, imageProfile, nagivate]);
+  }, [imageBanner, imageProfile, nagivate, updateUser]);
 
   const handleSubmit = useCallback(
     async (data: any) => {
@@ -142,14 +133,12 @@ const SignUp: React.FC = () => {
           email: Yup.string()
             .required('E-mail obrigatório')
             .email('Digite um e-mail válido'),
-          password: Yup.string().required().min(8),
-          repassword: Yup.string().required().min(8),
+          password: Yup.string().required().min(8).max(16),
+          repassword: Yup.string().required().min(8).max(16),
         });
 
         await schema.validate(data, { abortEarly: false });
-        if (imageProfile === null || imageBanner === null) {
-          throw new Error('Envio obrigatório de foto e capa');
-        }
+
         if (data.password !== data.repassword) {
           throw new Error('As senhas não são iguais');
         }

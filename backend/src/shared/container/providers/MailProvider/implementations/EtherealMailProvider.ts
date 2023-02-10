@@ -23,12 +23,17 @@ export default class EtherealMailProvider implements IMailProvider {
     this.client = transporter;
   }
 
-  public async sendMail(to: string, body: string): Promise<void> {
+  public async sendMail(
+    to: string,
+    subject: string,
+    body: string,
+  ): Promise<void> {
     const message = await this.client.sendMail({
-      from: 'Equipe Store <equipe@store.com.br> ',
+      from: 'Equipe MyGame <equipe@mygame.com.br> ',
       to,
-      subject: 'Recuperação de senha',
-      text: body,
+      subject,
+      // text: body,
+      html: body,
     });
     console.log('Message sent: %s', message.messageId);
   }
