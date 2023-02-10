@@ -142,8 +142,8 @@ const SignUp: React.FC = () => {
           email: Yup.string()
             .required('E-mail obrigatório')
             .email('Digite um e-mail válido'),
-          password: Yup.string().required().min(8),
-          repassword: Yup.string().required().min(8),
+          password: Yup.string().required().min(8).max(16),
+          repassword: Yup.string().required().min(8).max(16),
         });
 
         await schema.validate(data, { abortEarly: false });
@@ -204,7 +204,13 @@ const SignUp: React.FC = () => {
         console.log(`Error: ${e}`);
       }
     },
-    [categoriesGameSelected, signIn, handleImagesSubmit],
+    [
+      imageProfile,
+      imageBanner,
+      categoriesGameSelected,
+      signIn,
+      handleImagesSubmit,
+    ],
   );
 
   const handleFileProfile = useCallback((file: File | null) => {
