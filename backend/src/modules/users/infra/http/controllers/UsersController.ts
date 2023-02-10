@@ -28,6 +28,7 @@ export default class UsersController {
     });
 
     delete user.password;
+    delete user.id;
 
     return res.status(201).json(user);
   }

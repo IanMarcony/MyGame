@@ -28,6 +28,7 @@ interface AuthContextData {
   signIn(credentials: SignInCredentials): Promise<void>;
 
   signOut(): void;
+  updateUser(user: object): void;
 }
 
 type AuthProviderProps = React.PropsWithChildren;
@@ -75,9 +76,28 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setData({} as AuthState);
   }, []);
 
+  const updateUser = useCallback((user: object) => {
+    localStorage.removeItem(Constants.storage.user);
+    localStorage.setItem(Constants.storage.user, JSON.stringify(user));
+    const token = localStorage.getItem(Constants.storage.token);
+
+    if (token && user) {
+      setData({
+        token,
+        user,
+      });
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
-      value={{ user: data.user, token: data.token, signIn, signOut }}
+      value={{
+        user: data.user,
+        token: data.token,
+        signIn,
+        signOut,
+        updateUser,
+      }}
     >
       {children}
     </AuthContext.Provider>
