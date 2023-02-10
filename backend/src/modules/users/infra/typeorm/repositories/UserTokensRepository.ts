@@ -9,6 +9,13 @@ export default class UserTokensRepository implements IUserTokensRepository {
   constructor() {
     this.ormRepository = AppDataSource.getRepository(UserToken);
   }
+  public async delete(id: number): Promise<void> {
+    await this.ormRepository
+      .createQueryBuilder()
+      .delete()
+      .where('id = :id', { id })
+      .execute();
+  }
 
   public async findByToken(token: string): Promise<UserToken | null> {
     const userToken = await this.ormRepository.findOne({ where: { token } });

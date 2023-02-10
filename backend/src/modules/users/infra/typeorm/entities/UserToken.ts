@@ -13,7 +13,7 @@ import User from './User';
 @Entity('user_tokens')
 export default class UserToken {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column()
   @Generated('uuid')

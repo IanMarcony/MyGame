@@ -32,7 +32,7 @@ export default class EtherealMailProvider implements IMailProvider {
       from: 'Equipe MyGame <equipe@mygame.com.br> ',
       to,
       subject,
-      text: body,
+      // text: body,
       html: body,
     });
     console.log('Message sent: %s', message.messageId);

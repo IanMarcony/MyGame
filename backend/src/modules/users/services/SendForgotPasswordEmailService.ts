@@ -30,7 +30,7 @@ export default class SendForgotPasswordEmailService {
     await this.mailProvider.sendMail(
       email,
       'Recuperação de senha',
-      `<h1>Pedido de troca de senha</h1> <p>Recebemos uma solicitação de troca de senha, para trocar, acesse o seguinte link: ${process.env.CLIENT_URL}/password/change?token=${token}</p>`,
+      `<h1>Pedido de troca de senha</h1><br><p>Recebemos uma solicitação de troca de senha, para trocar, acesse o seguinte link: ${process.env.CLIENT_URL}/password/change?token=${token}</p>`,
     );
   }
 }
