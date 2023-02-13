@@ -9,10 +9,19 @@ import api from '../services/api';
 
 import Constants from '../utils/Constants';
 
+interface IUser {
+  name: string;
+  email: string;
+  birth_date: string;
+  url_profile_photo: string;
+  url_banner_photo: string;
+  description: string;
+}
+
 interface AuthState {
   token: string;
 
-  user: object;
+  user: IUser;
 }
 
 interface SignInCredentials {
@@ -22,7 +31,7 @@ interface SignInCredentials {
 }
 
 interface AuthContextData {
-  user: object;
+  user: IUser;
   token: string;
 
   signIn(credentials: SignInCredentials): Promise<void>;
@@ -76,7 +85,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setData({} as AuthState);
   }, []);
 
-  const updateUser = useCallback((user: object) => {
+  const updateUser = useCallback((user: IUser) => {
     localStorage.removeItem(Constants.storage.user);
     localStorage.setItem(Constants.storage.user, JSON.stringify(user));
     const token = localStorage.getItem(Constants.storage.token);
