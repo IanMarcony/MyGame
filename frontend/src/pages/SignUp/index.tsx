@@ -129,7 +129,7 @@ const SignUp: React.FC = () => {
       try {
         const schema = Yup.object().shape({
           name: Yup.string().required('Nome obrigatório'),
-          // birth_date: Yup.string().required('Data de nascimento obrigatória'),
+          birth_date: Yup.string().required('Data de nascimento obrigatória'),
           email: Yup.string()
             .required('E-mail obrigatório')
             .email('Digite um e-mail válido'),

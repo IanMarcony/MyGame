@@ -65,4 +65,10 @@ export const UserButtonsContainer = styled.div`
     padding: 5px;
     background-color: var(--background-color);
   }
+
+  a:nth-child(3) {
+    border-radius: 10px;
+    padding: 5px;
+    background-color: var(--background-color);
+  }
 `;

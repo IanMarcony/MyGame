@@ -2,12 +2,12 @@ import React from 'react';
 
 import { Container } from './styles';
 
-const Notifications: React.FC = () => {
+const Chat: React.FC = () => {
   return (
     <Container>
-      <h1>Notifications</h1>
+      <h1>Chat</h1>
     </Container>
   );
 };
 
-export default Notifications;
+export default Chat;

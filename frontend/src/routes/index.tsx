@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes as Switch, Route } from 'react-router-dom';
 import ChangePassword from '../pages/ChangePassword';
+import Chat from '../pages/Chat';
 import ForgotPassword from '../pages/ForgotPassword';
 import Home from '../pages/Home';
 import Notifications from '../pages/Notifications';
@@ -22,6 +23,7 @@ const Routes: React.FC = () => {
         <Route index element={<Home />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="profile/:email" element={<Profile />} />
+        <Route path="chat" element={<Chat />} />
       </Route>
 
       <Route path="*" element={<PageNotFound />} />

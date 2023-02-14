@@ -1,23 +1,20 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React, {
-  InputHTMLAttributes,
   useEffect,
   useRef,
   useCallback,
   useState,
+  TextareaHTMLAttributes,
 } from 'react';
-
-import { IconBaseProps } from 'react-icons';
 import { useField } from '@unform/core';
 import { Container } from './styles';
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   name: string;
-  icon: React.ComponentType<IconBaseProps>;
 }
 
-const Input: React.FC<InputProps> = ({ name, icon: Icon, ...rest }) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+const TextAreaInput: React.FC<InputProps> = ({ name, ...rest }: InputProps) => {
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
   const { fieldName, defaultValue, error, registerField } = useField(name);
@@ -39,8 +36,7 @@ const Input: React.FC<InputProps> = ({ name, icon: Icon, ...rest }) => {
 
   return (
     <Container isErrored={!!error} isFocused={isFocused} isFilled={isFilled}>
-      {Icon && <Icon size={20} />}
-      <input
+      <textarea
         onFocus={handleInputFocus}
         onBlur={handleInputBlur}
         defaultValue={defaultValue}
@@ -51,4 +47,4 @@ const Input: React.FC<InputProps> = ({ name, icon: Icon, ...rest }) => {
   );
 };
 
-export default Input;
+export default TextAreaInput;

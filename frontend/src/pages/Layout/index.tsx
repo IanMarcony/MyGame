@@ -1,6 +1,6 @@
 import { Avatar } from '@mui/material';
 import React from 'react';
-import { FiBell, FiHome, FiLogOut } from 'react-icons/fi';
+import { FiBell, FiHome, FiLogOut, FiMessageCircle } from 'react-icons/fi';
 import { Link, Outlet } from 'react-router-dom';
 
 import SearchInput from '../../components/SearchInput';
@@ -38,6 +38,10 @@ const Layout: React.FC = () => {
               src={UserIcon}
               sx={{ width: 35, height: 35 }}
             />
+          </Link>
+
+          <Link to="/dashboard/chat">
+            <FiMessageCircle />
           </Link>
 
           <Link to="/" onClick={signOut}>

@@ -12,6 +12,8 @@ export const Container = styled.div<ContainerProps>`
   border: 2px solid #232129;
   padding: 16px;
   width: 100%;
+  display: flex;
+  align-items: center;
   color: var(--text-color);
   ${(props) =>
     props.isErrored &&
@@ -29,18 +31,32 @@ export const Container = styled.div<ContainerProps>`
     css`
       color: var(--text-secondary-color);
     `}
-  display: flex;
-  align-items: center;
   & + div {
     margin-top: 8px;
   }
-  input {
+  textarea {
     flex: 1;
+    max-height: 300px;
     background: transparent;
     border: 0;
     color: #f4ede8;
+    resize: none;
+    overflow-y: auto;
     &::placeholder {
       color: var(--text-color);
+    }
+    &::-webkit-scrollbar {
+      width: 10px;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: darkgrey;
+      outline: 1px solid slategrey;
     }
   }
   svg {
