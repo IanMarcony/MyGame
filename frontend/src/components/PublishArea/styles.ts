@@ -8,8 +8,6 @@ export const Container = styled(Form)`
   flex-direction: column;
   justify-content: space-between;
   width: 45%;
-  max-height: 300px;
-
   > div {
     margin-bottom: 10px;
   }
@@ -40,4 +38,72 @@ export const DropFilesArea = styled.div`
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
+`;
+
+export const CarrouselFiles = styled.div`
+  display: flex;
+  width: 100%;
+  height: 300px;
+  overflow-y: hidden;
+  overflow-x: auto;
+
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 1px solid slategrey;
+  }
+
+  scroll-behavior: smooth;
+`;
+
+export const ButtonCarrouselPrev = styled.button`
+  position: absolute;
+  max-width: 35px;
+  height: 35px;
+  top: 25%;
+  left: 27%;
+  border-radius: 50%;
+`;
+
+export const ButtonCarrouselNext = styled.button`
+  position: absolute;
+  position: absolute;
+  max-width: 35px;
+  height: 35px;
+  top: 25%;
+  left: 71%;
+  border-radius: 50%;
+`;
+
+export const ItemCarrousel = styled.div`
+  scroll-snap-align: start;
+  flex: none;
+  min-width: 100%;
+  height: 100%;
+  padding: 14px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+
+  video {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+  }
 `;

@@ -40,7 +40,7 @@ const SearchInput: React.FC = () => {
         type="text"
         placeholder="Pesquisar..."
         value={textSearch}
-        defaultValue={textSearch}
+        defaultValue=""
         onChange={(e) => setTextSeach(e.target.value)}
       />
 
