@@ -4,21 +4,13 @@ import PublishArea from '../../components/PublishArea';
 
 import { Container, PostsArea } from './styles';
 
-interface IComments {
-  text: string;
-  user: {
-    profile_image: string;
-    username: string;
-  };
-}
-
 interface IPosts {
   id: number;
   text: string;
   files: string[];
+  is_liked: boolean;
   count_likes: number;
   count_comments: number;
-  comments: IComments[];
 }
 
 const Home: React.FC = () => {

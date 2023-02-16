@@ -12,8 +12,7 @@ export const PostsArea = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 45%;
+  margin-top: 30px;
   overflow-y: auto;
-  div + div {
-    margin-bottom: 10px;
-  }
 `;

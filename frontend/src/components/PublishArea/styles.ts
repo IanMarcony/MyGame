@@ -3,6 +3,7 @@ import { Form } from '@unform/web';
 import styled from 'styled-components';
 
 export const Container = styled(Form)`
+  position: relative;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -72,17 +73,18 @@ export const ButtonCarrouselPrev = styled.button`
   max-width: 35px;
   height: 35px;
   top: 25%;
-  left: 27%;
+  padding: 10px;
+  left: 0;
   border-radius: 50%;
 `;
 
 export const ButtonCarrouselNext = styled.button`
   position: absolute;
-  position: absolute;
   max-width: 35px;
   height: 35px;
+  padding: 10px;
   top: 25%;
-  left: 71%;
+  left: 95%;
   border-radius: 50%;
 `;
 

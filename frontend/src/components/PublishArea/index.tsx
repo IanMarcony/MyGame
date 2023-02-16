@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-plusplus */
 import React, { useState, useCallback, useRef } from 'react';
@@ -103,9 +104,13 @@ const PublishArea: React.FC = () => {
     <Container onSubmit={handleSubmit}>
       {files.length > 0 && (
         <CarrouselFiles ref={carrouselRef} onWheel={(e) => handleWheel(e)}>
-          <ButtonCarrouselPrev type="button" onClick={handlePrevItem}>
-            <FiArrowLeft />
-          </ButtonCarrouselPrev>
+          {files.length > 1 ? (
+            <ButtonCarrouselPrev type="button" onClick={handlePrevItem}>
+              <FiArrowLeft />
+            </ButtonCarrouselPrev>
+          ) : (
+            <></>
+          )}
           {files.map((item, index) => {
             return (
               <ItemCarrousel key={item.name + index}>
@@ -121,9 +126,13 @@ const PublishArea: React.FC = () => {
             );
           })}
 
-          <ButtonCarrouselNext type="button" onClick={handleNextItem}>
-            <FiArrowRight />
-          </ButtonCarrouselNext>
+          {files.length > 1 ? (
+            <ButtonCarrouselNext type="button" onClick={handleNextItem}>
+              <FiArrowRight />
+            </ButtonCarrouselNext>
+          ) : (
+            <></>
+          )}
         </CarrouselFiles>
       )}
 
