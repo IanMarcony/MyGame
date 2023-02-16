@@ -1,9 +1,11 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-plusplus */
+import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import React, { useState, useCallback, useRef } from 'react';
 import { BsUpload } from 'react-icons/bs';
-import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
+import { FiArrowLeft, FiArrowRight, FiLock } from 'react-icons/fi';
+import { MdPublic, MdRemoveCircle } from 'react-icons/md';
 import TextAreaInput from '../TextAreaInput';
 
 import {
@@ -21,10 +23,9 @@ const PublishArea: React.FC = () => {
 
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrlFiles, setPreviewUrlFiles] = useState<string[]>([]);
+  const [isPostPublic, setViewPost] = useState(1);
 
   const handleSubmit = useCallback(async () => {}, []);
-
-  const handleRemoveFile = useCallback(() => {}, []);
 
   const handleFiles = useCallback(
     (filesUpload: File[] | null) => {
@@ -100,6 +101,14 @@ const PublishArea: React.FC = () => {
     carrouselRef.current?.scrollBy(300, 0);
   }, []);
 
+  const handleRemoveFileUploaded = useCallback((index: number) => {
+    setFiles((old) => old.filter((item, indexOld) => indexOld !== index));
+  }, []);
+
+  const handleChangeViewPost = useCallback((event: SelectChangeEvent) => {
+    setViewPost(parseInt(event.target.value, 10));
+  }, []);
+
   return (
     <Container onSubmit={handleSubmit}>
       {files.length > 0 && (
@@ -114,6 +123,12 @@ const PublishArea: React.FC = () => {
           {files.map((item, index) => {
             return (
               <ItemCarrousel key={item.name + index}>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFileUploaded(index)}
+                >
+                  <MdRemoveCircle />
+                </button>
                 {item.type.includes('image') ? (
                   <img src={previewUrlFiles[index]} alt={item.name} />
                 ) : (
@@ -135,6 +150,17 @@ const PublishArea: React.FC = () => {
           )}
         </CarrouselFiles>
       )}
+
+      <Select value={isPostPublic.toString()} onChange={handleChangeViewPost}>
+        <MenuItem value={1}>
+          <MdPublic />
+          Público
+        </MenuItem>
+        <MenuItem value={0}>
+          <FiLock />
+          Somente Amigos
+        </MenuItem>
+      </Select>
 
       <TextAreaInput
         rows={4}
