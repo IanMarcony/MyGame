@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-bitwise */
 /* eslint-disable radix */
 /* eslint-disable no-unsafe-optional-chaining */
@@ -45,6 +46,7 @@ const DateInput: React.FC<InputProps> = ({ name }) => {
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <DatePicker
           inputFormat="dd/MM/yyyy"
+          toolbarFormat="MM/dd/yyyy"
           label="Data de nascimento"
           disableHighlightToday
           disableFuture

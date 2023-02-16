@@ -1,17 +1,13 @@
 import React from 'react';
 
-import { Routes as Switch, Route } from 'react-router-dom';
-
-import Dashboard from '../../pages/Dashboard';
+import Layout from '../../pages/Layout';
 
 import RequireAuth from '../../security/RequireAuth';
 
 const ProtectedRoutes: React.FC = () => {
   return (
     <RequireAuth>
-      <Switch>
-        <Route path="/" element={<Dashboard />} />
-      </Switch>
+      <Layout />
     </RequireAuth>
   );
 };
