@@ -10,8 +10,8 @@ import {
 import ActionUser from './ActionUser';
 import Post from './Post';
 
-Entity('interactions_users');
-export default class InteractionUser {
+@Entity('interactions_users')
+class InteractionUser {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -39,3 +39,5 @@ export default class InteractionUser {
   @CreateDateColumn()
   created_at: Date;
 }
+
+export default InteractionUser;

@@ -4,19 +4,21 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import Post from './Post';
 
-@Entity('videos')
-export default class Video {
+@Entity('files_post')
+export default class FilePost {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'text' })
-  url_video: string;
+  filename: string;
+
+  @Column({ type: 'varchar' })
+  type: string;
 
   @Column()
   id_post: number;
@@ -24,9 +26,6 @@ export default class Video {
   @ManyToOne(() => Post)
   @JoinColumn({ name: 'id_post' })
   post: Post;
-
-  @OneToMany(() => Video, (video) => video.post)
-  videos: Video[];
 
   @CreateDateColumn()
   created_at: Date;
