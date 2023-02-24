@@ -9,9 +9,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import User from '@modules/users/infra/typeorm/entities/User';
-import Image from './Image';
-import Video from './Video';
-import ComentUser from './ComentUser';
+
+import FilePost from './FilePost';
+import CommentUser from './CommentUser';
+import InteractionUser from './InteractionUser';
 
 @Entity('posts')
 export default class Post {
@@ -34,14 +35,27 @@ export default class Post {
   @JoinColumn({ name: 'id_user' })
   user: User;
 
-  @OneToMany(() => Video, (video) => video.post)
-  videos: Video[];
+  @OneToMany(() => FilePost, (filePost) => filePost.post, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  filesPost: FilePost[];
 
-  @OneToMany(() => Image, (image) => image.post)
-  images: Image[];
+  @OneToMany(() => CommentUser, (coments_users) => coments_users.post, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  coments: CommentUser[];
 
-  @OneToMany(() => ComentUser, (coments_users) => coments_users.post)
-  coments: ComentUser[];
+  @OneToMany(
+    () => InteractionUser,
+    (interactions_users) => interactions_users.post,
+    {
+      cascade: true,
+      onDelete: 'CASCADE',
+    },
+  )
+  interactions: InteractionUser[];
 
   @CreateDateColumn()
   created_at: Date;

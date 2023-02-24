@@ -10,7 +10,7 @@ import {
 import Post from './Post';
 
 @Entity('coments_users')
-export default class ComentUser {
+export default class CommentUser {
   @PrimaryGeneratedColumn()
   id: number;
 

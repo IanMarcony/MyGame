@@ -25,6 +25,29 @@ export const Container = styled(Form)`
       opacity: 0.9;
     }
   }
+
+  .MuiInputBase-root {
+    width: max-content;
+    height: 35px;
+    border: 1px solid #232129;
+    color: var(--text-color);
+  }
+
+  .MuiSelect-select {
+    display: flex;
+    align-items: center;
+    svg {
+      margin-right: 5px;
+    }
+  }
+
+  .MuitMenuItem-root {
+    display: flex;
+    align-items: center;
+    svg {
+      margin-right: 5px;
+    }
+  }
 `;
 
 export const DropFilesArea = styled.div`
@@ -47,7 +70,6 @@ export const CarrouselFiles = styled.div`
   height: 300px;
   overflow-y: hidden;
   overflow-x: auto;
-
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
 
@@ -76,6 +98,7 @@ export const ButtonCarrouselPrev = styled.button`
   padding: 10px;
   left: 0;
   border-radius: 50%;
+  z-index: 10;
 `;
 
 export const ButtonCarrouselNext = styled.button`
@@ -86,6 +109,7 @@ export const ButtonCarrouselNext = styled.button`
   top: 25%;
   left: 95%;
   border-radius: 50%;
+  z-index: 10;
 `;
 
 export const ItemCarrousel = styled.div`
@@ -94,6 +118,17 @@ export const ItemCarrousel = styled.div`
   min-width: 100%;
   height: 100%;
   padding: 14px;
+  position: relative;
+
+  button {
+    margin: 0;
+    top: 5px;
+    position: absolute;
+    max-width: 30px;
+    height: 30px;
+    padding: 10px;
+    border-radius: 50%;
+  }
 
   img {
     width: 100%;
