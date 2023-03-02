@@ -9,7 +9,7 @@ export default interface IInteractionsRepository {
     id_user: number,
     action: 'COMMENT' | 'LIKE',
   ): Promise<InteractionUser | null>;
-  findAllByAction(
+  countByAction(
     id_post: number,
     id_user: number,
     action: 'COMMENT' | 'LIKE',

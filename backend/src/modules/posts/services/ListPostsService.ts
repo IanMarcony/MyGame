@@ -1,9 +1,11 @@
+import IFriendsRepository from '@modules/users/repositories/IFriendsRepository';
 import { inject, injectable } from 'tsyringe';
 import Post from '../infra/typeorm/entities/Post';
 import IPostsRepository from '../repositories/IPostsRepository';
 
 interface IRequest {
   id_user?: number;
+  id_user_logged: number;
   page: number;
 }
 
@@ -17,10 +19,40 @@ export default class ListPostsServices {
   constructor(
     @inject('PostsRepository')
     private postsRepository: IPostsRepository,
+    @inject('FriendsRepository')
+    private friendsRepository: IFriendsRepository,
   ) {}
 
-  async execute({ page, id_user }: IRequest): Promise<IResponse> {
-    const response = await this.postsRepository.findByPageOrUser(page, id_user);
+  async execute({
+    page,
+    id_user,
+    id_user_logged,
+  }: IRequest): Promise<IResponse> {
+    const { posts, count } = await this.postsRepository.findByPageOrUser(
+      page,
+      id_user,
+    );
+
+    let response: IResponse = { posts: [], count };
+
+    for (let index = 0; index < posts.length; index++) {
+      const post = posts[index];
+
+      if (!post.is_private) {
+        response.posts.push(post);
+      } else {
+        const { id_user: id_friend } = post;
+
+        const isFriend = await this.friendsRepository.findFriend(
+          id_user_logged,
+          id_friend,
+        );
+
+        if (isFriend) {
+          response.posts.push(post);
+        }
+      }
+    }
 
     return response;
   }
