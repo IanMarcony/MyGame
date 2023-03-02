@@ -10,6 +10,7 @@ export default class UsersRepository implements IUserRepository {
   constructor() {
     this.ormRepository = AppDataSource.getRepository(User);
   }
+
   public async findAllByName(name: string): Promise<User[]> {
     const user = await this.ormRepository.find({ where: { name } });
 
@@ -25,7 +26,11 @@ export default class UsersRepository implements IUserRepository {
   public async findByEmailWithFullProfile(email: string): Promise<User | null> {
     const user = await this.ormRepository.findOne({
       where: { email },
-      relations: { account_games_users: true, preferences: true },
+      relations: {
+        account_games_users: true,
+        preferences: true,
+        followers: true,
+      },
     });
 
     return user;
