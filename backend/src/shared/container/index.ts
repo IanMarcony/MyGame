@@ -15,6 +15,14 @@ import IAccountGameRepository from '@modules/accountgames/repositories/IAccountG
 import AccountGameRepository from '@modules/accountgames/infra/typeorm/repositories/AccountGameRepository';
 import ICategoryGameRepository from '@modules/categoriesgames/repositories/ICategoryGameRepository';
 import CategoryGameRepository from '@modules/categoriesgames/infra/typeorm/repositories/CategoryGameRepository';
+import ICommentRepository from '@modules/posts/repositories/ICommentRepository';
+import CommentRepository from '@modules/posts/infra/typeorm/repositories/CommentRepository';
+import IFilesPostRepository from '@modules/posts/repositories/IFilesPostRepository';
+import FilesPostRepository from '@modules/posts/infra/typeorm/repositories/FilesPostRepository';
+import IInteractionsRepository from '@modules/posts/repositories/IInteractionsRepository';
+import InteractionsRepository from '@modules/posts/infra/typeorm/repositories/InteractionsRepository';
+import IPostsRepository from '@modules/posts/repositories/IPostsRepository';
+import PostsRepository from '@modules/posts/infra/typeorm/repositories/PostsRepository';
 
 container.registerSingleton<IUsersRepository>(
   'UsersRepository',
@@ -44,4 +52,24 @@ container.registerSingleton<IAccountGameUsersRepository>(
 container.registerSingleton<IAccountGameRepository>(
   'AccountGameRepository',
   AccountGameRepository,
+);
+
+container.registerSingleton<ICommentRepository>(
+  'CommentsRepository',
+  CommentRepository,
+);
+
+container.registerSingleton<IFilesPostRepository>(
+  'FilesPostRepository',
+  FilesPostRepository,
+);
+
+container.registerSingleton<IInteractionsRepository>(
+  'InteractionsRepository',
+  InteractionsRepository,
+);
+
+container.registerSingleton<IPostsRepository>(
+  'PostsRepository',
+  PostsRepository,
 );
