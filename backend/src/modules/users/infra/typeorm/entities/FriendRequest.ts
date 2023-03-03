@@ -12,7 +12,7 @@ import User from './User';
 @Entity('friend_requests')
 export default class FriendRequest {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column()
   id_user_requester: number; //Quem solicita

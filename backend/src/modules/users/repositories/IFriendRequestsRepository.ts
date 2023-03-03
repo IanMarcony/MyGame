@@ -3,7 +3,6 @@ import FriendRequest from '../infra/typeorm/entities/FriendRequest';
 
 export default interface IFriendRequestsRepository {
   create(data: ICreateFriendRequestDTO): Promise<FriendRequest>;
-  delete(id_user: number, id_user_required: number): Promise<void>;
   deleteById(id_request: number): Promise<void>;
   findByUserAndUserRequired(
     id_user: number,

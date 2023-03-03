@@ -6,7 +6,7 @@ interface IRequest {
   id_user: number;
 }
 @injectable()
-export default class ShowProfileUserService {
+export default class DeleteUserService {
   constructor(
     @inject('UsersRepository')
     private usersRepository: IUserRepository,

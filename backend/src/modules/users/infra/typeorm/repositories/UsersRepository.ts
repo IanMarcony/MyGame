@@ -1,6 +1,6 @@
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
 import IUserRepository from '@modules/users/repositories/IUsersRepository';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { AppDataSource } from 'data-source';
 import User from '../entities/User';
 
@@ -12,7 +12,7 @@ export default class UsersRepository implements IUserRepository {
   }
 
   public async findAllByName(name: string): Promise<User[]> {
-    const user = await this.ormRepository.find({ where: { name } });
+    const user = await this.ormRepository.find({ where: { name: Like(name) } });
 
     return user;
   }

@@ -23,6 +23,10 @@ import IInteractionsRepository from '@modules/posts/repositories/IInteractionsRe
 import InteractionsRepository from '@modules/posts/infra/typeorm/repositories/InteractionsRepository';
 import IPostsRepository from '@modules/posts/repositories/IPostsRepository';
 import PostsRepository from '@modules/posts/infra/typeorm/repositories/PostsRepository';
+import IFriendRequestsRepository from '@modules/users/repositories/IFriendRequestsRepository';
+import FriendRequestsRepository from '@modules/users/infra/typeorm/repositories/FriendRequestsRepository';
+import IFriendsRepository from '@modules/users/repositories/IFriendsRepository';
+import FriendsRepository from '@modules/users/infra/typeorm/repositories/FriendsRepository';
 
 container.registerSingleton<IUsersRepository>(
   'UsersRepository',
@@ -72,4 +76,14 @@ container.registerSingleton<IInteractionsRepository>(
 container.registerSingleton<IPostsRepository>(
   'PostsRepository',
   PostsRepository,
+);
+
+container.registerSingleton<IFriendRequestsRepository>(
+  'FriendRequestsRepository',
+  FriendRequestsRepository,
+);
+
+container.registerSingleton<IFriendsRepository>(
+  'FriendsRepository',
+  FriendsRepository,
 );
