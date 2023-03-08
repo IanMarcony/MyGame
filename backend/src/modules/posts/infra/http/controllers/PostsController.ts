@@ -81,14 +81,15 @@ export default class PostsController {
   }
 
   public async index(req: Request, res: Response): Promise<Response> {
-    const { id_user, page } = req.body;
+    const { id_user } = req.query;
+    const { page } = req.params;
     const { id: id_user_logged } = req.user;
 
     const listPosts = container.resolve(ListPostsServices);
 
     const posts = await listPosts.execute({
-      id_user,
-      page,
+      id_user: parseInt(id_user as string),
+      page: parseInt(page),
       id_user_logged,
     });
 

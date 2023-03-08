@@ -13,7 +13,7 @@ const likesController = new LikesController();
 const postsController = new PostsController();
 const upload = multer(uploadConfig);
 
-postsRouter.get('/', ensureAuthenticated, postsController.index);
+postsRouter.get('/:page', ensureAuthenticated, postsController.index);
 postsRouter.post(
   '/',
   ensureAuthenticated,
