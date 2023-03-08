@@ -54,14 +54,6 @@ export default class CreateUserService {
       throw new AppError('Select at least one preference');
     }
 
-    const checkUserExistWithSameName = await this.usersRepository.findByName(
-      name,
-    );
-
-    if (checkUserExistWithSameName) {
-      throw new AppError('Name already exists');
-    }
-
     const checkUserExistWithSameEmail = await this.usersRepository.findByEmail(
       email,
     );

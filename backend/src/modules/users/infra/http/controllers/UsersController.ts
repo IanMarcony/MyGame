@@ -1,4 +1,7 @@
 import CreateUserService from '@modules/users/services/CreateUserService';
+import DeleteUserService from '@modules/users/services/DeleteUserService';
+import SearchUsersService from '@modules/users/services/SearchUsersService';
+import ShowProfileUserService from '@modules/users/services/ShowProfileUserService';
 import UpdateUserService from '@modules/users/services/UpdateUserService';
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
@@ -50,5 +53,43 @@ export default class UsersController {
     delete user.id;
 
     return res.status(200).json(user);
+  }
+
+  public async delete(req: Request, res: Response): Promise<Response> {
+    const { id: id_user } = req.user;
+
+    const deleteUser = container.resolve(DeleteUserService);
+
+    await deleteUser.execute({
+      id_user,
+    });
+
+    return res.status(204).json({});
+  }
+
+  public async index(req: Request, res: Response): Promise<Response> {
+    const { username } = req.query;
+
+    const searchUser = container.resolve(SearchUsersService);
+
+    await searchUser.execute({
+      username: (username as string) || '',
+    });
+
+    return res.status(200).json({});
+  }
+
+  public async show(req: Request, res: Response): Promise<Response> {
+    const { email } = req.params;
+    const { id: id_user } = req.user;
+
+    const showProfile = container.resolve(ShowProfileUserService);
+
+    const profile = await showProfile.execute({
+      email,
+      id_user,
+    });
+
+    return res.status(200).json(profile);
   }
 }

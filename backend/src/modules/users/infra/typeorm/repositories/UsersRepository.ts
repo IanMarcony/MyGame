@@ -1,6 +1,6 @@
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
 import IUserRepository from '@modules/users/repositories/IUsersRepository';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { AppDataSource } from 'data-source';
 import User from '../entities/User';
 
@@ -10,8 +10,9 @@ export default class UsersRepository implements IUserRepository {
   constructor() {
     this.ormRepository = AppDataSource.getRepository(User);
   }
+
   public async findAllByName(name: string): Promise<User[]> {
-    const user = await this.ormRepository.find({ where: { name } });
+    const user = await this.ormRepository.find({ where: { name: Like(name) } });
 
     return user;
   }
@@ -25,7 +26,11 @@ export default class UsersRepository implements IUserRepository {
   public async findByEmailWithFullProfile(email: string): Promise<User | null> {
     const user = await this.ormRepository.findOne({
       where: { email },
-      relations: { account_games_users: true, preferences: true },
+      relations: {
+        account_games_users: true,
+        preferences: true,
+        followers: true,
+      },
     });
 
     return user;

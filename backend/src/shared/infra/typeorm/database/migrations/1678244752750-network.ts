@@ -4,7 +4,7 @@ import ActionUser from '@modules/posts/infra/typeorm/entities/ActionUser';
 import { AppDataSource } from 'data-source';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class network1676586582865 implements MigrationInterface {
+export class network1678244752750 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await AppDataSource.createQueryBuilder()
       .insert()

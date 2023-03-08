@@ -22,5 +22,8 @@ usersRouter.patch(
   upload.any(),
   profileBannerUserController.update,
 );
+usersRouter.delete('/', ensureAuthenticated, usersController.delete);
+usersRouter.get('/', ensureAuthenticated, usersController.index);
+usersRouter.get('/:email', ensureAuthenticated, usersController.show);
 
 export default usersRouter;

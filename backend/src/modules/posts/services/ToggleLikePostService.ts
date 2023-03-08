@@ -36,19 +36,14 @@ export default class ToggleLikePostService {
         id_user,
         'LIKE',
       );
+      await this.postsRepository.updateLikesCountById(id_post, 'UNLIKE');
     } else {
       await this.interactionsRepository.create({
         id_post,
         id_user,
         action_user: 'LIKE',
       });
+      await this.postsRepository.updateLikesCountById(id_post, 'LIKE');
     }
-
-    this.interactionsRepository
-      .findAllByAction(id_post, id_user, 'LIKE')
-      .then((count) => {
-        post.count_likes = count;
-        this.postsRepository.update(post);
-      });
   }
 }
