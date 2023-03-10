@@ -30,7 +30,7 @@ const PublishArea: React.FC = () => {
   const [previewUrlFiles, setPreviewUrlFiles] = useState<string[]>([]);
   const [isPostPublic, setViewPost] = useState(1);
 
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const { addNewPosts } = usePostsHome();
 
   const handleSubmit = useCallback(
@@ -51,12 +51,18 @@ const PublishArea: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        addNewPosts(response.data);
+
+        const newPost = {
+          ...response.data,
+          user,
+        };
+
+        addNewPosts(newPost);
       } catch (error) {
         console.log(error);
       }
     },
-    [addNewPosts, files, isPostPublic, token],
+    [addNewPosts, files, isPostPublic, token, user],
   );
 
   const handleFiles = useCallback(
