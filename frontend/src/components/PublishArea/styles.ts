@@ -69,7 +69,7 @@ export const CarrouselFiles = styled.div`
   width: 100%;
   height: 300px;
   overflow-y: hidden;
-  overflow-x: auto;
+  overflow-x: hidden;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
 

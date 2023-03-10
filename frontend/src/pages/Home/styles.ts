@@ -6,6 +6,7 @@ export const Container = styled.div`
   align-items: center;
   height: 100%;
   padding: 10px;
+  overflow-y: auto;
 `;
 
 export const PostsArea = styled.div`
@@ -14,5 +15,6 @@ export const PostsArea = styled.div`
   align-items: center;
   width: 45%;
   margin-top: 30px;
-  overflow-y: auto;
+  overflow-y: none;
+  overflow-x: none;
 `;

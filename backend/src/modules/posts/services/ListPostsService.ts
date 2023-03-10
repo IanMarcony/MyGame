@@ -38,6 +38,16 @@ export default class ListPostsServices {
     for (let index = 0; index < posts.length; index++) {
       const post = posts[index];
 
+      delete post.user.password;
+      delete post.user.id;
+      delete post.user.url_banner_photo;
+      delete post.user.birth_date;
+      delete post.user.description;
+      delete post.user.created_at;
+      delete post.user.updated_at;
+
+      Object.assign(post, { count_comments: post.coments.length });
+
       if (!post.is_private) {
         response.posts.push(post);
       } else {

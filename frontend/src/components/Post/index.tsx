@@ -4,8 +4,9 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 import { AiFillLike, AiOutlineLike } from 'react-icons/ai';
-
 import { FaComment } from 'react-icons/fa';
+import { Avatar } from '@mui/material';
+import UserIcon from '../../assets/user.png';
 import {
   ActionsButtonArea,
   ActionsPostArea,
@@ -15,23 +16,34 @@ import {
   Container,
   InfoPost,
   ItemCarrousel,
+  UserInfoArea,
 } from './styles';
+
+interface IUser {
+  url_profile_photo: string;
+  name: string;
+  email: string;
+}
 
 interface IComments {
   text: string;
-  user: {
-    profile_image: string;
-    username: string;
-  };
+  user: IUser;
+}
+
+interface IFilePost {
+  id: number;
+  filename: string;
+  type: 'image' | 'video';
 }
 
 interface IPosts {
   id: number;
-  text: string;
-  files: string[];
+  description: string;
+  filesPost: IFilePost[];
   is_liked: boolean;
   count_likes: number;
   count_comments: number;
+  user: IUser;
 }
 
 interface PostProps {
@@ -66,22 +78,41 @@ const Posts: React.FC<PostProps> = ({ value }) => {
 
   return (
     <Container>
-      {value.files.length > 0 && (
+      <UserInfoArea to={`/dashboard/profile/${value.user.email}`}>
+        <Avatar
+          alt="Foto de perfil"
+          src={
+            value.user.url_profile_photo
+              ? `${process.env.REACT_APP_API_URL}/files/${value.user.url_profile_photo}`
+              : UserIcon
+          }
+          sx={{ width: 35, height: 35 }}
+        />
+
+        {value.user.name}
+      </UserInfoArea>
+      {value.filesPost.length > 0 && (
         <CarrouselFiles ref={carrouselRef} onWheel={(e) => handleWheel(e)}>
-          {value.files.length > 1 ? (
+          {value.filesPost.length > 1 ? (
             <ButtonCarrouselPrev type="button" onClick={handlePrevItem}>
               <FiArrowLeft />
             </ButtonCarrouselPrev>
           ) : (
             <></>
           )}
-          {value.files.map((item, index) => {
+          {value.filesPost.map((item, index) => {
             return (
-              <ItemCarrousel key={item + index}>
-                {item ? (
-                  <img src={item} alt={item} />
+              <ItemCarrousel key={item.id}>
+                {item.type === 'image' ? (
+                  <img
+                    src={`${process.env.REACT_APP_API_URL}/files/${item.filename}`}
+                    alt={item.filename}
+                  />
                 ) : (
-                  <video src={item} controls>
+                  <video
+                    src={`${process.env.REACT_APP_API_URL}/files/${item.filename}`}
+                    controls
+                  >
                     Cannot played
                   </video>
                 )}
@@ -89,7 +120,7 @@ const Posts: React.FC<PostProps> = ({ value }) => {
             );
           })}
 
-          {value.files.length > 1 ? (
+          {value.filesPost.length > 1 ? (
             <ButtonCarrouselNext type="button" onClick={handleNextItem}>
               <FiArrowRight />
             </ButtonCarrouselNext>
@@ -99,7 +130,7 @@ const Posts: React.FC<PostProps> = ({ value }) => {
         </CarrouselFiles>
       )}
 
-      <p>{value.text}</p>
+      <p>{value.description}</p>
 
       <ActionsPostArea>
         <InfoPost>

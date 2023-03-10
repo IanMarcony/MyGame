@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -17,7 +18,7 @@ export const CarrouselFiles = styled.div`
 
   margin-bottom: 15px;
   overflow-y: hidden;
-  overflow-x: auto;
+  overflow-x: hidden;
 
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
@@ -118,5 +119,19 @@ export const ActionsButtonArea = styled.div`
 
   button + button {
     margin-left: 10px;
+  }
+`;
+
+export const UserInfoArea = styled(Link)`
+  background: transparent;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-color);
+  width: 100%;
+  margin-bottom: 10px;
+
+  .MuiAvatar-root {
+    margin-right: 10px;
   }
 `;
