@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable jsx-a11y/media-has-caption */
 /* eslint-disable react/no-array-index-key */
@@ -18,6 +19,8 @@ import {
   ItemCarrousel,
   UserInfoArea,
 } from './styles';
+import api from '../../services/api';
+import { useAuth } from '../../hooks/auth';
 
 interface IUser {
   url_profile_photo: string;
@@ -38,6 +41,7 @@ interface IFilePost {
 
 interface IPosts {
   id: number;
+  id_user: number;
   description: string;
   filesPost: IFilePost[];
   is_liked: boolean;
@@ -54,6 +58,7 @@ const Posts: React.FC<PostProps> = ({ value }) => {
   const [isLiked, setLiked] = useState(value.is_liked);
   const [countLikes, setCountLikes] = useState(value.count_likes);
   const [countComments, setCountComments] = useState(value.count_comments);
+  const { token } = useAuth();
 
   const carrouselRef = useRef<HTMLDivElement>(null);
   const handleWheel = useCallback(
@@ -75,6 +80,25 @@ const Posts: React.FC<PostProps> = ({ value }) => {
   const handleNextItem = useCallback(() => {
     carrouselRef.current?.scrollBy(300, 0);
   }, []);
+
+  const handleLikePost = useCallback(async () => {
+    await api.put(
+      '/posts/likes',
+      {
+        id_user: value.id_user,
+        id_post: value.id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    const like = !isLiked;
+    setLiked(like);
+    like ? setCountLikes(countLikes + 1) : setCountLikes(countLikes - 1);
+  }, [value.id_user, value.id, token, isLiked, countLikes]);
 
   return (
     <Container>
@@ -143,7 +167,7 @@ const Posts: React.FC<PostProps> = ({ value }) => {
         </InfoPost>
 
         <ActionsButtonArea>
-          <button type="button">
+          <button type="button" onClick={() => handleLikePost()}>
             {isLiked ? <AiFillLike /> : <AiOutlineLike />}
           </button>
           <button type="button">

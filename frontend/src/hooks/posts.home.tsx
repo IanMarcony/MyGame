@@ -20,6 +20,7 @@ interface IFilePost {
 
 interface IPosts {
   id: number;
+  id_user: number;
   description: string;
   filesPost: IFilePost[];
   is_liked: boolean;

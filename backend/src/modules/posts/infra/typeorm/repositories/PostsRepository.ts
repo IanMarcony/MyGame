@@ -62,7 +62,9 @@ export default class PostsRepository implements IPostsRepository {
         id_user: id_user ? id_user : Not(IsNull()),
       },
       relations: {
-        interactions: true,
+        interactions: {
+          action_user: true,
+        },
         coments: true,
         filesPost: true,
         user: true,

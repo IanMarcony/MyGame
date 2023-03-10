@@ -46,8 +46,12 @@ export default class ListPostsServices {
       delete post.user.created_at;
       delete post.user.updated_at;
 
-      Object.assign(post, { count_comments: post.coments.length });
+      const is_liked = !!post.interactions.find(
+        (item) =>
+          item.id_user === id_user_logged && item.action_user.type === 'LIKE',
+      );
 
+      Object.assign(post, { count_comments: post.coments.length, is_liked });
       if (!post.is_private) {
         response.posts.push(post);
       } else {
