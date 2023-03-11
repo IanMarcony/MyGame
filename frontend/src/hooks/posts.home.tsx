@@ -6,8 +6,8 @@ interface IUser {
   name: string;
   email: string;
 }
-
 interface IComments {
+  id: number;
   text: string;
   user: IUser;
 }
@@ -26,6 +26,7 @@ interface IPosts {
   is_liked: boolean;
   count_likes: number;
   count_comments: number;
+  coments: IComments[];
   user: IUser;
 }
 

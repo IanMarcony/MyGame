@@ -65,7 +65,7 @@ export default class PostsRepository implements IPostsRepository {
         interactions: {
           action_user: true,
         },
-        coments: true,
+        coments: { user: true },
         filesPost: true,
         user: true,
       },

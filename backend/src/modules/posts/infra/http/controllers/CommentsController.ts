@@ -5,7 +5,9 @@ import { container } from 'tsyringe';
 
 export default class CommentsController {
   public async create(req: Request, res: Response): Promise<Response> {
-    const { id_post, id_user, text } = req.body;
+    const { id_post, text } = req.body;
+
+    const { id: id_user } = req.user;
 
     const createCommentOnPost = container.resolve(CreateCommentOnPostService);
 
@@ -19,14 +21,15 @@ export default class CommentsController {
   }
 
   public async delete(req: Request, res: Response): Promise<Response> {
-    const { id_post, id_user, id_comment } = req.body;
+    const { id_post, id_comment } = req.query;
+    const { id: id_user } = req.user;
 
     const deleteCommentOnPost = container.resolve(DeleteCommentOnPostService);
 
     await deleteCommentOnPost.execute({
-      id_post,
+      id_post: parseInt(id_post as string),
       id_user,
-      id_comment,
+      id_comment: parseInt(id_comment as string),
     });
 
     return res.status(204).json({});

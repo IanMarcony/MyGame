@@ -46,6 +46,16 @@ export default class ListPostsServices {
       delete post.user.created_at;
       delete post.user.updated_at;
 
+      for (const comment of post.coments) {
+        delete comment.user.password;
+        delete comment.user.id;
+        delete comment.user.url_banner_photo;
+        delete comment.user.birth_date;
+        delete comment.user.description;
+        delete comment.user.created_at;
+        delete comment.user.updated_at;
+      }
+
       const is_liked = !!post.interactions.find(
         (item) =>
           item.id_user === id_user_logged && item.action_user.type === 'LIKE',

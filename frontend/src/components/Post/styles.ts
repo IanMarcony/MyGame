@@ -1,3 +1,4 @@
+import { Form } from '@unform/web';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -133,5 +134,94 @@ export const UserInfoArea = styled(Link)`
 
   .MuiAvatar-root {
     margin-right: 10px;
+  }
+`;
+
+export const CommentsArea = styled.div`
+  margin-top: 5px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border-radius: 10px;
+  background-color: var(--background-color);
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 1px solid slategrey;
+    border-radius: 10px;
+  }
+
+  scroll-behavior: smooth;
+  max-height: 140px;
+`;
+
+export const CommentItem = styled.div`
+  background-color: var(--background-secondary-color);
+  max-width: max-content;
+  height: max-content;
+  border-radius: 10px;
+  padding: 10px 12px;
+  & + & {
+    margin-top: 10px;
+  }
+  p {
+    width: 100%;
+    word-break: break-all;
+    text-align: justify;
+  }
+
+  section {
+    display: flex;
+
+    button {
+      margin-left: 10px;
+      border-radius: 10px;
+      height: 100%;
+      padding: 3px;
+
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+  }
+`;
+
+export const UserInfoCommentArea = styled(Link)`
+  background: transparent;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-color);
+  width: 100%;
+  margin-bottom: 10px;
+
+  .MuiAvatar-root {
+    margin-right: 10px;
+  }
+`;
+
+export const AddCommentArea = styled(Form)`
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+
+  button {
+    border-radius: 10px;
+    width: 50px;
+    height: 50px;
+    margin-left: 5px;
   }
 `;
