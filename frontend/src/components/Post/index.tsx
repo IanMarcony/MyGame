@@ -95,7 +95,6 @@ const Posts: React.FC<PostProps> = ({ value }) => {
     await api.put(
       '/posts/likes',
       {
-        id_user: value.id_user,
         id_post: value.id,
       },
       {
