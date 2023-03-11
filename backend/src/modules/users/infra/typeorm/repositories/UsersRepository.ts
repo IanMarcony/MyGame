@@ -12,7 +12,9 @@ export default class UsersRepository implements IUserRepository {
   }
 
   public async findAllByName(name: string): Promise<User[]> {
-    const user = await this.ormRepository.find({ where: { name: Like(name) } });
+    const user = await this.ormRepository.find({
+      where: { name: Like(`${name}%`) },
+    });
 
     return user;
   }

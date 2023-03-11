@@ -31,6 +31,7 @@ export const ResultContainer = styled.div`
   max-height: 95px;
   overflow-y: auto;
   overflow-x: hidden;
+  z-index: 100;
 
   -webkit-box-shadow: -1px 3px 5px 1px rgba(0, 0, 0, 0.75);
   -moz-box-shadow: -1px 3px 5px 1px rgba(0, 0, 0, 0.75);
