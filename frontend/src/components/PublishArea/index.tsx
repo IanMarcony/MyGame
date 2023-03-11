@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-plusplus */
@@ -6,6 +7,10 @@ import React, { useState, useCallback, useRef } from 'react';
 import { BsUpload } from 'react-icons/bs';
 import { FiArrowLeft, FiArrowRight, FiLock } from 'react-icons/fi';
 import { MdPublic, MdRemoveCircle } from 'react-icons/md';
+import { v4 as uuidv4 } from 'uuid';
+import { useAuth } from '../../hooks/auth';
+import { usePostsHome } from '../../hooks/posts.home';
+import api from '../../services/api';
 import TextAreaInput from '../TextAreaInput';
 
 import {
@@ -25,7 +30,40 @@ const PublishArea: React.FC = () => {
   const [previewUrlFiles, setPreviewUrlFiles] = useState<string[]>([]);
   const [isPostPublic, setViewPost] = useState(1);
 
-  const handleSubmit = useCallback(async () => {}, []);
+  const { token, user } = useAuth();
+  const { addNewPosts } = usePostsHome();
+
+  const handleSubmit = useCallback(
+    async (data: any) => {
+      try {
+        const formData = new FormData();
+        const is_private = isPostPublic === 0;
+
+        formData.append('description', data.text_post);
+        formData.append('is_private', `${is_private}`);
+
+        for (const fileUpload of files) {
+          formData.append(uuidv4(), fileUpload);
+        }
+
+        const response = await api.post('/posts', formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const newPost = {
+          ...response.data,
+          user,
+        };
+
+        addNewPosts(newPost);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [addNewPosts, files, isPostPublic, token, user],
+  );
 
   const handleFiles = useCallback(
     (filesUpload: File[] | null) => {

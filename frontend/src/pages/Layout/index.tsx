@@ -35,7 +35,11 @@ const Layout: React.FC = () => {
           <Link to={`/dashboard/profile/${user.email}`}>
             <Avatar
               alt="Foto de perfil"
-              src={UserIcon}
+              src={
+                user.url_profile_photo
+                  ? `${process.env.REACT_APP_API_URL}/files/${user.url_profile_photo}`
+                  : UserIcon
+              }
               sx={{ width: 35, height: 35 }}
             />
           </Link>

@@ -7,7 +7,7 @@ import { container } from 'tsyringe';
 
 export default class PostsController {
   public async create(req: Request, res: Response): Promise<Response> {
-    const { id_post, description, is_private } = req.body;
+    const { description, is_private } = req.body;
     const { id: id_user } = req.user;
 
     const filesUpload = req.files as Express.Multer.File[];
@@ -23,10 +23,9 @@ export default class PostsController {
     const createPost = container.resolve(CreatePostService);
 
     const post = await createPost.execute({
-      id_post,
       id_user,
       description,
-      is_private,
+      is_private: is_private === 'true',
       files,
     });
 

@@ -2,31 +2,24 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Posts from '../../components/Post';
 import PublishArea from '../../components/PublishArea';
 import { useAuth } from '../../hooks/auth';
+import { usePostsHome } from '../../hooks/posts.home';
 import api from '../../services/api';
 
 import { Container, PostsArea } from './styles';
 
-interface IPosts {
-  id: number;
-  text: string;
-  files: string[];
-  is_liked: boolean;
-  count_likes: number;
-  count_comments: number;
-}
-
 const Home: React.FC = () => {
-  const [posts, setPosts] = useState<IPosts[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const { token } = useAuth();
 
+  const { getPosts, addLastPosts } = usePostsHome();
+
   const handleLoadPosts = useCallback(async () => {
     if (loading) {
       return;
     }
-    if (total > 0 && posts.length === total) {
+    if (total > 0 && getPosts().length === total) {
       return;
     }
     setLoading(true);
@@ -42,12 +35,12 @@ const Home: React.FC = () => {
 
     const { count, posts: newPosts } = data;
 
-    setPosts([...posts, ...newPosts]);
+    addLastPosts(newPosts);
 
     setTotal(count);
     setPage(page + 1);
     setLoading(false);
-  }, [loading, page, posts, total, token]);
+  }, [loading, total, getPosts, page, token, addLastPosts]);
 
   const handleInifiteScroll = useCallback(
     async (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
@@ -66,11 +59,11 @@ const Home: React.FC = () => {
   }, []);
 
   return (
-    <Container>
+    <Container onScroll={(e) => handleInifiteScroll(e)}>
       <PublishArea />
-      <PostsArea onScroll={(e) => handleInifiteScroll(e)}>
-        {posts.length > 0 &&
-          posts.map((item) => {
+      <PostsArea>
+        {getPosts().length > 0 &&
+          getPosts().map((item) => {
             return <Posts key={item.id} value={item} />;
           })}
       </PostsArea>
