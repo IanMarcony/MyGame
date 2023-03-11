@@ -54,6 +54,7 @@ const PublishArea: React.FC = () => {
 
         const newPost = {
           ...response.data,
+          coments: [],
           user,
         };
 
