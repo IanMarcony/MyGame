@@ -1,14 +1,34 @@
 import { Form } from '@unform/web';
 
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
-export const Container = styled(Form)`
+export const Container = styled.div`
+  width: 45%;
+  display: flex;
+
+  flex-direction: column;
+`;
+
+const appearFromLeft = keyframes`
+  from{
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to{
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+export const Content = styled(Form)`
   position: relative;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 45%;
+  animation: ${appearFromLeft} 1s;
+  width: 100%;
+
   > div {
     margin-bottom: 10px;
   }
@@ -48,6 +68,14 @@ export const Container = styled(Form)`
       margin-right: 5px;
     }
   }
+`;
+
+export const AddPostButton = styled.button`
+  margin-bottom: 10px;
+  border-radius: 10px;
+  padding: 10px;
+  width: max-content;
+  font-size: 12px;
 `;
 
 export const DropFilesArea = styled.div`

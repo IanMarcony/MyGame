@@ -3,6 +3,7 @@ import { Waypoint } from 'react-waypoint';
 import Posts from '../../components/Post';
 import PublishArea from '../../components/PublishArea';
 import { useAuth } from '../../hooks/auth';
+import { usePostsHome } from '../../hooks/posts.home';
 import api from '../../services/api';
 
 import { Container, PostsArea } from './styles';
@@ -42,14 +43,15 @@ const Home: React.FC = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const { token } = useAuth();
+  const { getPosts, addLastPosts } = usePostsHome();
 
-  const [posts, setPosts] = useState<IPosts[]>([]);
+  // const [posts, setPosts] = useState<IPosts[]>([]);
 
   const handleLoadPosts = useCallback(async () => {
     if (loading) {
       return;
     }
-    if (total > 0 && posts.length === total) {
+    if (total > 0 && getPosts().length === total) {
       return;
     }
     setLoading(true);
@@ -61,14 +63,12 @@ const Home: React.FC = () => {
       },
     });
 
-    console.log(data);
-
     const { count, posts: newPosts } = data;
 
-    setPosts([...posts, ...newPosts]);
+    addLastPosts(newPosts);
     setTotal(count);
     setLoading(false);
-  }, [loading, total, posts, page, token]);
+  }, [loading, total, getPosts, page, token, addLastPosts]);
 
   useEffect(() => {
     handleLoadPosts();
@@ -82,11 +82,11 @@ const Home: React.FC = () => {
     <Container>
       <PublishArea />
       <PostsArea>
-        {posts.map((item, i) => {
+        {getPosts().map((item, i) => {
           return (
             <>
               <Posts key={item.id} value={item} />
-              {i === posts.length - posts.length * 0.5 && (
+              {i === getPosts().length - getPosts().length * 0.5 && (
                 <Waypoint onEnter={() => setPage(page + 1)} />
               )}
             </>
