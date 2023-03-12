@@ -29,8 +29,12 @@ export default class UsersRepository implements IUserRepository {
     const user = await this.ormRepository.findOne({
       where: { email },
       relations: {
-        account_games_users: true,
-        preferences: true,
+        account_games_users: {
+          account_game: true,
+        },
+        preferences: {
+          account_game: true,
+        },
         followers: true,
       },
     });

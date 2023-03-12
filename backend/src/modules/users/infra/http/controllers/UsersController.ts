@@ -90,6 +90,8 @@ export default class UsersController {
       id_user,
     });
 
+    delete profile.password;
+
     return res.status(200).json(profile);
   }
 }
