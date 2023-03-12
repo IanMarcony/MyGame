@@ -1,3 +1,4 @@
+import { Form } from '@unform/web';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -290,4 +291,125 @@ export const PostsArea = styled.div`
   margin-top: 30px;
   overflow-y: none;
   overflow-x: none;
+`;
+
+export const ModalContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  background-color: var(--background-color);
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  align-items: center;
+`;
+
+export const ModalHeader = styled.header`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  h2 {
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  button {
+    border-radius: 50%;
+    padding: 5px;
+    width: 25px;
+    height: 25px;
+  }
+`;
+
+export const FormBasicInfo = styled(Form)`
+  width: 100%;
+  height: max-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+
+  input + input {
+    margin-top: 10px;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    margin-top: 12px;
+
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  > h2 {
+    margin-bottom: 14px;
+  }
+
+  .preferences {
+    margin-top: 20px;
+  }
+
+  h3 {
+    margin-bottom: 15px;
+    margin-top: 15px;
+  }
+
+  .MuiInputBase-root {
+    width: 100%;
+    fieldset {
+      border: 0;
+    }
+    .MuiSvgIcon-root {
+      color: var(--text-color);
+    }
+
+    .MuiChip-label {
+      color: var(--text-secondary-color);
+    }
+  }
+`;
+
+export const InputImagesArea = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-bottom: 10px;
+  justify-content: space-between;
+`;
+
+export const DropImageProfileArea = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background-color);
+  border-radius: 10px;
+  border: 2px solid #232129;
+  padding: 16px;
+  width: 40%;
+  color: var(--text-color);
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+`;
+
+export const ImageProfileArea = styled.div``;
+export const ImageBannerArea = styled.div`
+  width: 200px;
+  height: 90px;
+  img {
+    width: 100%;
+    height: 100%;
+  }
+`;
+
+export const AccountsContainer = styled.div`
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-row-gap: 1.5rem;
+  align-items: center;
 `;

@@ -1,9 +1,20 @@
-import { Avatar } from '@mui/material';
-import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Avatar,
+  Box,
+  Chip,
+  MenuItem,
+  OutlinedInput,
+  Select,
+} from '@mui/material';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Waypoint } from 'react-waypoint';
 
 import { Link, useParams } from 'react-router-dom';
 
+import Modal from 'react-modal';
+import { FiBookOpen, FiUser } from 'react-icons/fi';
+import { BsUpload } from 'react-icons/bs';
+import { AiFillCloseCircle } from 'react-icons/ai';
 import BannerIcon from '../../assets/banner.jpg';
 import UserIcon from '../../assets/user.png';
 import Posts from '../../components/Post';
@@ -11,6 +22,7 @@ import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';
 
 import {
+  AccountsContainer,
   AccountsGamesArea,
   AccountsPreferencesArea,
   ActionsProfileArea,
@@ -18,8 +30,15 @@ import {
   Container,
   ContentProfile,
   DescriptionProfile,
+  DropImageProfileArea,
+  FormBasicInfo,
   FriendsListArea,
   HeaderInfoProfile,
+  ImageBannerArea,
+  ImageProfileArea,
+  InputImagesArea,
+  ModalContainer,
+  ModalHeader,
   PostsArea,
   PreferencesArea,
   ProfileImagesArea,
@@ -27,6 +46,10 @@ import {
   UserExtrasProfile,
   UserInfoProfile,
 } from './styles';
+
+import Input from '../../components/Input';
+import DateInput from '../../components/DateInput';
+import AccountInput from '../../components/AccountInput';
 
 interface IPreferences {
   id: number;
@@ -92,6 +115,16 @@ const Profile: React.FC = () => {
     [],
   );
   const [userId, setUserId] = useState(0);
+  const fileImageProfileInput = useRef<HTMLInputElement>(null);
+  const fileImageBannerInput = useRef<HTMLInputElement>(null);
+  const [imageProfile, setImageProfile] = useState<File | null>(null);
+  const [imageBanner, setImageBanner] = useState<File | null>(null);
+  const [previewUrlImageProfile, setPreviewUrlImageProfile] = useState(() => {
+    return UserIcon;
+  });
+  const [previewUrlImageBanner, setPreviewUrlImageBanner] = useState(() => {
+    return BannerIcon;
+  });
 
   const [friends, setFriends] = useState<IFriends[]>([]);
   const [typeButtonShow, setTypeButtonShow] = useState(1);
@@ -101,6 +134,12 @@ const Profile: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+
+  const [isOpenBasicInfoModal, setIsOpenBasicInfoModal] = useState(false);
+
+  const toggleOpenBasicInfoModal = useCallback(() => {
+    setIsOpenBasicInfoModal(!isOpenBasicInfoModal);
+  }, [isOpenBasicInfoModal]);
 
   const handleLoadPosts = useCallback(
     async (id_user: number) => {
@@ -150,10 +189,16 @@ const Profile: React.FC = () => {
       setBannerIcon(
         `${process.env.REACT_APP_API_URL}/files/${userData.url_banner_photo}`,
       );
+      setPreviewUrlImageBanner(
+        `${process.env.REACT_APP_API_URL}/files/${userData.url_banner_photo}`,
+      );
     }
 
     if (userData.url_profile_photo) {
       setUserIcon(
+        `${process.env.REACT_APP_API_URL}/files/${userData.url_profile_photo}`,
+      );
+      setPreviewUrlImageProfile(
         `${process.env.REACT_APP_API_URL}/files/${userData.url_profile_photo}`,
       );
     }
@@ -249,6 +294,66 @@ const Profile: React.FC = () => {
     setTypeButtonShow(1);
   }, [token, userId]);
 
+  const handleBasicInfoSubmit = useCallback(
+    async (data: any) => {
+      toggleOpenBasicInfoModal();
+    },
+    [toggleOpenBasicInfoModal],
+  );
+
+  const handleFileProfile = useCallback((file: File | null) => {
+    setImageProfile(file);
+    if (file) {
+      setPreviewUrlImageProfile(URL.createObjectURL(file));
+    }
+  }, []);
+
+  const handleFileBanner = useCallback((file: File | null) => {
+    setImageBanner(file);
+    if (file) {
+      setPreviewUrlImageBanner(URL.createObjectURL(file));
+    }
+  }, []);
+  const handleOnDragOver = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+    },
+    [],
+  );
+  const handleOnDropImageProfile = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const imageFile = event.dataTransfer.files[0];
+
+      handleFileProfile(imageFile);
+    },
+    [handleFileProfile],
+  );
+
+  const handleOnDropImageBanner = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const imageFile = event.dataTransfer.files[0];
+
+      handleFileBanner(imageFile);
+    },
+    [handleFileBanner],
+  );
+
+  const handleFileImageProfileClick = useCallback(() => {
+    // eslint-disable-next-line no-unused-expressions
+    fileImageProfileInput.current && fileImageProfileInput.current.click();
+  }, [fileImageProfileInput]);
+
+  const handleFileImageBannerClick = useCallback(() => {
+    // eslint-disable-next-line no-unused-expressions
+    fileImageBannerInput.current && fileImageBannerInput.current.click();
+  }, [fileImageBannerInput]);
+
   useEffect(() => {
     setPostsUser([]);
     setTotal(0);
@@ -276,30 +381,43 @@ const Profile: React.FC = () => {
           </UserInfoProfile>
 
           <UserExtrasProfile>
-            {!isSelfUser && (
-              <ActionsProfileArea>
-                <button type="button">Envia mensagem</button>
+            <ActionsProfileArea>
+              {!isSelfUser && (
+                <>
+                  <button type="button">Envia mensagem</button>
 
-                {typeButtonShow === 1 && (
-                  <button type="button" onClick={() => handleAddFriend()}>
-                    Adicionar amigo
-                  </button>
-                )}
-                {typeButtonShow === 2 && (
-                  <button
-                    type="button"
-                    onClick={() => handleCancelFriendRequest()}
-                  >
-                    Cancelar solicitação
-                  </button>
-                )}
-                {typeButtonShow === 3 && (
-                  <button type="button" onClick={() => handleDeleteFriend()}>
-                    Excluir amigo
-                  </button>
-                )}
-              </ActionsProfileArea>
-            )}
+                  {typeButtonShow === 1 && (
+                    <button type="button" onClick={() => handleAddFriend()}>
+                      Adicionar amigo
+                    </button>
+                  )}
+
+                  {typeButtonShow === 2 && (
+                    <button
+                      type="button"
+                      onClick={() => handleCancelFriendRequest()}
+                    >
+                      Cancelar solicitação
+                    </button>
+                  )}
+                  {typeButtonShow === 3 && (
+                    <button type="button" onClick={() => handleDeleteFriend()}>
+                      Excluir amigo
+                    </button>
+                  )}
+                </>
+              )}
+
+              {isSelfUser && (
+                <button
+                  type="button"
+                  onClick={() => toggleOpenBasicInfoModal()}
+                >
+                  Alterar perfil
+                </button>
+              )}
+            </ActionsProfileArea>
+
             <FriendsListArea>
               <h3>Amigos</h3>
 
@@ -369,6 +487,166 @@ const Profile: React.FC = () => {
           );
         })}
       </PostsArea>
+
+      <Modal
+        isOpen={isOpenBasicInfoModal}
+        onRequestClose={toggleOpenBasicInfoModal}
+        style={{
+          content: {
+            height: 'max-content',
+            padding: 0,
+            borderRadius: '10px',
+            border: '2px solid var(--text-color)',
+          },
+          overlay: {
+            backgroundColor: '#342e2ed3',
+          },
+        }}
+      >
+        <ModalContainer>
+          <ModalHeader>
+            <h2>Atualize suas informações</h2>
+            <button type="button" onClick={() => toggleOpenBasicInfoModal()}>
+              <AiFillCloseCircle />
+            </button>
+          </ModalHeader>
+          <FormBasicInfo onSubmit={handleBasicInfoSubmit}>
+            <InputImagesArea>
+              <DropImageProfileArea
+                onDragOver={handleOnDragOver}
+                onDrop={handleOnDropImageProfile}
+                onClick={handleFileImageProfileClick}
+              >
+                {previewUrlImageProfile && (
+                  <ImageProfileArea>
+                    <Avatar
+                      alt="Foto de perfil"
+                      src={previewUrlImageProfile}
+                      sx={{ width: 100, height: 100 }}
+                    />
+                  </ImageProfileArea>
+                )}
+                <p>
+                  Arraste e solte sua foto de perfil <BsUpload />{' '}
+                </p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileImageProfileInput}
+                  hidden
+                  onChange={(e) =>
+                    handleFileProfile(e.target.files && e.target.files[0])
+                  }
+                />
+              </DropImageProfileArea>
+
+              <DropImageProfileArea
+                onDragOver={handleOnDragOver}
+                onDrop={handleOnDropImageBanner}
+                onClick={handleFileImageBannerClick}
+              >
+                {previewUrlImageBanner && (
+                  <ImageBannerArea>
+                    <img alt="Foto de capa" src={previewUrlImageBanner} />
+                  </ImageBannerArea>
+                )}
+                <p>
+                  Arraste e solte sua foto de capa <BsUpload />{' '}
+                </p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileImageBannerInput}
+                  hidden
+                  onChange={(e) =>
+                    handleFileBanner(e.target.files && e.target.files[0])
+                  }
+                />
+              </DropImageProfileArea>
+            </InputImagesArea>
+
+            <Input
+              name="name"
+              icon={FiUser}
+              type="text"
+              placeholder="Nome"
+              defaultValue={nameUser}
+            />
+
+            <Input
+              name="description"
+              icon={FiBookOpen}
+              type="text"
+              placeholder="Descrição"
+              defaultValue={descriptionUser}
+            />
+
+            <DateInput name="birth_date" />
+
+            {/* <h2 className="preferences">Agora fale um pouco mais sobre você</h2>
+
+          {accountGames && (
+            <>
+              <h3>
+                Insira o username das contas de jogos para compartilhar com
+                amigos, se não tiver não se preocupe, não é obrigatório
+              </h3>
+              <AccountsContainer>
+                {accountGames.map((item) => {
+                  return (
+                    <AccountInput
+                      key={item.id}
+                      name={`account_${item.company.toLowerCase()}_${item.id}`}
+                      valueAccount={item}
+                      placeholder="Username"
+                    />
+                  );
+                })}
+              </AccountsContainer>
+            </>
+          )}
+
+          {categoriesGame && (
+            <>
+              {' '}
+              <h3>Selecione pelo menos uma preferência</h3>
+              <Select
+                labelId="demo-multiple-chip-label"
+                id="demo-multiple-chip"
+                multiple
+                placeholder="Selecione suas preferências"
+                defaultValue={[]}
+                value={categoriesGameSelected}
+                onChange={handleChange}
+                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {selected.map((value, index) => (
+                      <Chip key={index} label={value} />
+                    ))}
+                  </Box>
+                )}
+              >
+                {categoriesGame.map((category) => (
+                  <MenuItem
+                    key={category.id}
+                    value={`${category.id}-${category.value}`}
+                    style={getStyles(
+                      `${category.id}-${category.value}`,
+                      categoriesGameSelected,
+                    )}
+                  >
+                    {category.value}
+                  </MenuItem>
+                ))}
+              </Select>
+            </>
+          )} */}
+
+            <button type="submit">Atualizar dados</button>
+          </FormBasicInfo>
+        </ModalContainer>
+      </Modal>
     </Container>
   );
 };
