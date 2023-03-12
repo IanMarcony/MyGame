@@ -9,7 +9,6 @@ import { FiArrowLeft, FiArrowRight, FiLock } from 'react-icons/fi';
 import { MdPublic, MdRemoveCircle } from 'react-icons/md';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuth } from '../../hooks/auth';
-import { usePostsHome } from '../../hooks/posts.home';
 import api from '../../services/api';
 import TextAreaInput from '../TextAreaInput';
 
@@ -31,7 +30,6 @@ const PublishArea: React.FC = () => {
   const [isPostPublic, setViewPost] = useState(1);
 
   const { token, user } = useAuth();
-  const { addNewPosts } = usePostsHome();
 
   const handleSubmit = useCallback(
     async (data: any) => {
@@ -52,18 +50,18 @@ const PublishArea: React.FC = () => {
           },
         });
 
-        const newPost = {
-          ...response.data,
-          coments: [],
-          user,
-        };
+        // const newPost = {
+        //   ...response.data,
+        //   coments: [],
+        //   user,
+        // };
 
-        addNewPosts(newPost);
+        dispatchEvent(new Event('load'));
       } catch (error) {
         console.log(error);
       }
     },
-    [addNewPosts, files, isPostPublic, token, user],
+    [files, isPostPublic, token],
   );
 
   const handleFiles = useCallback(

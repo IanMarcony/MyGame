@@ -19,7 +19,7 @@ export default class AddFriendRequestService {
   async execute({
     id_user: id_user_requester,
     email_friend,
-  }: IRequest): Promise<void> {
+  }: IRequest): Promise<number> {
     const userFriend = await this.usersRepository.findByEmail(email_friend);
     if (!userFriend) {
       throw new AppError('Profile not found', 404);
@@ -34,9 +34,11 @@ export default class AddFriendRequestService {
       throw new AppError('Request already exists');
     }
 
-    await this.friendRequestsRepository.create({
+    const friendRequest = await this.friendRequestsRepository.create({
       id_user_requester,
       id_user_required: userFriend.id,
     });
+
+    return friendRequest.id;
   }
 }

@@ -64,6 +64,8 @@ export default class ListPostsServices {
       Object.assign(post, { count_comments: post.coments.length, is_liked });
       if (!post.is_private) {
         response.posts.push(post);
+      } else if (id_user === id_user_logged) {
+        response.posts.push(post);
       } else {
         const { id_user: id_friend } = post;
 

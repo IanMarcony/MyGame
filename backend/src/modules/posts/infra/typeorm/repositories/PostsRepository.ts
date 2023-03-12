@@ -51,6 +51,13 @@ export default class PostsRepository implements IPostsRepository {
     page: number,
     id_user?: number | undefined,
   ): Promise<IPostPage> {
+    if (id_user === 0) {
+      return {
+        posts: [],
+        count: 0,
+      };
+    }
+
     const take = Constants.limitPostPerPage;
     const skip = (page - 1) * take;
 

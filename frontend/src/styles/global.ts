@@ -22,6 +22,19 @@ export default createGlobalStyle`
     color:var(--text-color);
     -webkit-font-smoothing:antialiased;
     font-family: 'Roboto', serif;
+    &::-webkit-scrollbar {
+      width: 5px;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: darkgrey;
+      outline: 1px solid slategrey;
+    }
 
   }
 

@@ -1,11 +1,41 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Waypoint } from 'react-waypoint';
 import Posts from '../../components/Post';
 import PublishArea from '../../components/PublishArea';
 import { useAuth } from '../../hooks/auth';
-import { usePostsHome } from '../../hooks/posts.home';
 import api from '../../services/api';
 
 import { Container, PostsArea } from './styles';
+
+interface IUser {
+  url_profile_photo: string;
+  name: string;
+  email: string;
+}
+interface IComments {
+  id: number;
+  text: string;
+  user: IUser;
+}
+
+interface IFilePost {
+  id: number;
+  filename: string;
+  type: 'image' | 'video';
+}
+
+interface IPosts {
+  id: number;
+  id_user: number;
+  description: string;
+  filesPost: IFilePost[];
+  is_private: boolean;
+  is_liked: boolean;
+  count_likes: number;
+  count_comments: number;
+  coments: IComments[];
+  user: IUser;
+}
 
 const Home: React.FC = () => {
   const [total, setTotal] = useState(0);
@@ -13,13 +43,13 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { token } = useAuth();
 
-  const { getPosts, addLastPosts } = usePostsHome();
+  const [posts, setPosts] = useState<IPosts[]>([]);
 
   const handleLoadPosts = useCallback(async () => {
     if (loading) {
       return;
     }
-    if (total > 0 && getPosts().length === total) {
+    if (total > 0 && posts.length === total) {
       return;
     }
     setLoading(true);
@@ -35,37 +65,33 @@ const Home: React.FC = () => {
 
     const { count, posts: newPosts } = data;
 
-    addLastPosts(newPosts);
-
+    setPosts([...posts, ...newPosts]);
     setTotal(count);
-    setPage(page + 1);
     setLoading(false);
-  }, [loading, total, getPosts, page, token, addLastPosts]);
-
-  const handleInifiteScroll = useCallback(
-    async (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
-      const bottom =
-        e.currentTarget.scrollHeight - e.currentTarget.scrollTop ===
-        e.currentTarget.clientHeight;
-      if (bottom) {
-        handleLoadPosts();
-      }
-    },
-    [handleLoadPosts],
-  );
+  }, [loading, total, posts, page, token]);
 
   useEffect(() => {
     handleLoadPosts();
   }, []);
 
+  useEffect(() => {
+    handleLoadPosts();
+  }, [page]);
+
   return (
-    <Container onScroll={(e) => handleInifiteScroll(e)}>
+    <Container>
       <PublishArea />
       <PostsArea>
-        {getPosts().length > 0 &&
-          getPosts().map((item) => {
-            return <Posts key={item.id} value={item} />;
-          })}
+        {posts.map((item, i) => {
+          return (
+            <>
+              <Posts key={item.id} value={item} />
+              {i === posts.length - posts.length * 0.5 && (
+                <Waypoint onEnter={() => setPage(page + 1)} />
+              )}
+            </>
+          );
+        })}
       </PostsArea>
     </Container>
   );

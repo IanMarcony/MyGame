@@ -1,3 +1,3 @@
 export default {
-  limitPostPerPage: 5,
+  limitPostPerPage: 10,
 };

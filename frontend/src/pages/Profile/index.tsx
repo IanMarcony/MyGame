@@ -1,5 +1,7 @@
 import { Avatar } from '@mui/material';
 import React, { useState, useEffect, useCallback } from 'react';
+import { Waypoint } from 'react-waypoint';
+
 import { Link, useParams } from 'react-router-dom';
 
 import BannerIcon from '../../assets/banner.jpg';
@@ -92,7 +94,8 @@ const Profile: React.FC = () => {
   const [userId, setUserId] = useState(0);
 
   const [friends, setFriends] = useState<IFriends[]>([]);
-  const [showButtonFriends, setShowButtonsFriends] = useState(true);
+  const [typeButtonShow, setTypeButtonShow] = useState(1);
+  const [requestIdFriend, setRequestIdFriend] = useState(0);
 
   const [postsUser, setPostsUser] = useState<IPosts[]>([]);
   const [total, setTotal] = useState(0);
@@ -119,13 +122,22 @@ const Profile: React.FC = () => {
       const { count, posts: newPosts } = data;
 
       setPostsUser([...postsUser, ...newPosts]);
-
       setTotal(count);
-      setPage(page + 1);
       setLoading(false);
     },
     [loading, total, postsUser, page, token],
   );
+
+  const handleInfiniteScroll = useCallback(() => {
+    if (loading) {
+      return;
+    }
+    if (total > 0 && postsUser.length === total) {
+      return;
+    }
+
+    setPage(page + 1);
+  }, [loading, page, postsUser.length, total]);
 
   const handleGetUserProfile = useCallback(async () => {
     const { data: userData } = await api.get(`/users/${email}`, {
@@ -145,6 +157,8 @@ const Profile: React.FC = () => {
         `${process.env.REACT_APP_API_URL}/files/${userData.url_profile_photo}`,
       );
     }
+
+    setUserId(userData.id);
 
     setNameUser(userData.name);
 
@@ -177,6 +191,17 @@ const Profile: React.FC = () => {
       ),
     );
 
+    const { is_friend, is_requested, id_request } = userData;
+
+    if (is_friend) {
+      setTypeButtonShow(3);
+    } else if (is_requested) {
+      setTypeButtonShow(2);
+      setRequestIdFriend(id_request);
+    } else {
+      setTypeButtonShow(1);
+    }
+
     const { data } = await api.get(`/posts/1`, {
       params: { page: 1, id_user: userData.id },
       headers: {
@@ -189,9 +214,40 @@ const Profile: React.FC = () => {
     setPostsUser([...newPosts]);
 
     setTotal(count);
-    setPage(page + 1);
     setLoading(false);
-  }, [email, page, token, user.email]);
+  }, [email, token, user.email]);
+
+  const handleAddFriend = useCallback(async () => {
+    const { data } = await api.post(
+      '/friends/request',
+      { email_friend: email },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    setRequestIdFriend(data.id_request);
+    setTypeButtonShow(2);
+  }, [email, token]);
+  const handleCancelFriendRequest = useCallback(async () => {
+    await api.delete(`/friends/request`, {
+      params: { id_request: requestIdFriend },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setTypeButtonShow(1);
+  }, [requestIdFriend, token]);
+  const handleDeleteFriend = useCallback(async () => {
+    await api.delete(`/friends/remove`, {
+      params: { id_friend: userId },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setTypeButtonShow(1);
+  }, [token, userId]);
 
   useEffect(() => {
     setPostsUser([]);
@@ -201,6 +257,10 @@ const Profile: React.FC = () => {
     setUserIcon(UserIcon);
     handleGetUserProfile();
   }, [email]);
+
+  useEffect(() => {
+    handleLoadPosts(userId);
+  }, [page]);
 
   return (
     <Container>
@@ -220,8 +280,23 @@ const Profile: React.FC = () => {
               <ActionsProfileArea>
                 <button type="button">Envia mensagem</button>
 
-                {showButtonFriends && (
-                  <button type="button">Adicionar amigo</button>
+                {typeButtonShow === 1 && (
+                  <button type="button" onClick={() => handleAddFriend()}>
+                    Adicionar amigo
+                  </button>
+                )}
+                {typeButtonShow === 2 && (
+                  <button
+                    type="button"
+                    onClick={() => handleCancelFriendRequest()}
+                  >
+                    Cancelar solicitação
+                  </button>
+                )}
+                {typeButtonShow === 3 && (
+                  <button type="button" onClick={() => handleDeleteFriend()}>
+                    Excluir amigo
+                  </button>
                 )}
               </ActionsProfileArea>
             )}
@@ -283,10 +358,16 @@ const Profile: React.FC = () => {
       </AccountsPreferencesArea>
 
       <PostsArea>
-        {postsUser.length > 0 &&
-          postsUser.map((item) => {
-            return <Posts key={item.id} value={item} />;
-          })}
+        {postsUser.map((item, i) => {
+          return (
+            <>
+              <Posts key={item.id} value={item} />
+              {i === postsUser.length - postsUser.length * 0.5 && (
+                <Waypoint onEnter={() => handleInfiniteScroll()} />
+              )}
+            </>
+          );
+        })}
       </PostsArea>
     </Container>
   );
