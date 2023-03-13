@@ -45,8 +45,6 @@ const Home: React.FC = () => {
   const { token } = useAuth();
   const { getPosts, addLastPosts } = usePostsHome();
 
-  // const [posts, setPosts] = useState<IPosts[]>([]);
-
   const handleLoadPosts = useCallback(async () => {
     if (loading) {
       return;
