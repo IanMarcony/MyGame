@@ -19,19 +19,24 @@ export const BannerUserIcon = styled.img`
   border-radius: 10px 10px 0 0;
   object-fit: cover;
   width: 100%;
-  height: 100%;
+  height: 450px;
 `;
 
-export const UserAvatarIcon = styled.img`
-  border-radius: 50%;
-  object-fit: cover;
+export const UserAvatarIcon = styled.div`
   position: absolute;
-  top: 65%;
+  top: 60%;
+  border-radius: 50%;
   left: 2%;
-  width: 22%;
-  height: 40%;
+  width: 200px;
+  height: 200px;
 
   border: 3px solid var(--text-secondary-color);
+  img {
+    border-radius: 50%;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 export const ContentProfile = styled.div`

@@ -518,7 +518,9 @@ const Profile: React.FC = () => {
     <Container>
       <ProfileImagesArea>
         <BannerUserIcon src={bannerIcon} alt="Banner" />
-        <UserAvatarIcon src={userIcon} alt="User" />
+        <UserAvatarIcon>
+          <img src={userIcon} alt="User" />
+        </UserAvatarIcon>
       </ProfileImagesArea>
       <ContentProfile>
         <HeaderInfoProfile>
