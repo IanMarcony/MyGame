@@ -63,6 +63,7 @@ interface IPreferences {
 
 interface IAccountsGames {
   id: number;
+  id_company: number;
   username: string;
   company: string;
   url_icon: string;
@@ -263,16 +264,27 @@ const Profile: React.FC = () => {
       }),
     );
 
+    setCategoriesGameSelected(
+      userData.preferences.map((item: { account_game: IPreferences }) => {
+        return `${item.account_game.id}-${item.account_game.value}`;
+      }),
+    );
+
     setAccountsGamesUser(
       userData.account_games_users.map(
         (item: {
           username: string;
           id: number;
-          account_game: { url_icon: string; company: string };
+          account_game: {
+            id: number;
+            url_icon: string;
+            company: string;
+          };
         }) => {
           return {
             username: item.username,
             id: item.id,
+            id_company: item.account_game.id,
             url_icon: item.account_game.url_icon,
             company: item.account_game.company,
           };
@@ -319,6 +331,7 @@ const Profile: React.FC = () => {
     setRequestIdFriend(data.id_request);
     setTypeButtonShow(2);
   }, [email, token]);
+
   const handleCancelFriendRequest = useCallback(async () => {
     await api.delete(`/friends/request`, {
       params: { id_request: requestIdFriend },
@@ -328,6 +341,7 @@ const Profile: React.FC = () => {
     });
     setTypeButtonShow(1);
   }, [requestIdFriend, token]);
+
   const handleDeleteFriend = useCallback(async () => {
     await api.delete(`/friends/remove`, {
       params: { id_friend: userId },
@@ -431,7 +445,30 @@ const Profile: React.FC = () => {
     ],
   );
 
-  const handlePreferencesInfoSubmit = useCallback(async () => {}, []);
+  const handlePreferencesInfoSubmit = useCallback(
+    async (data: any) => {
+      console.log(data);
+
+      const preferencesUserSave = categoriesGameSelected.map((item) => {
+        return {
+          id_category_game: parseInt(item.split('-')[0], 10),
+        };
+      });
+
+      const keysFromDataSubmit = Object.keys(data);
+      const keysAccountsGame = keysFromDataSubmit.filter(
+        (item) => item.includes('account_') && data[item] !== '',
+      );
+
+      const accountsGameUser = keysAccountsGame.map((item) => {
+        return {
+          username: data[item],
+          id_account_game: parseInt(item.split('_')[2], 10),
+        };
+      });
+    },
+    [categoriesGameSelected],
+  );
 
   const handleFileProfile = useCallback((file: File | null) => {
     setImageProfile(file);
@@ -500,6 +537,15 @@ const Profile: React.FC = () => {
     },
     [],
   );
+
+  const handleLoadPreferences = useCallback(async () => {
+    const [categoriesResponse, accountsResponse] = await Promise.all([
+      await api.get('/categoriesgame'),
+      await api.get('/accountgames'),
+    ]);
+    setCategoriesGame(categoriesResponse.data);
+    setAccountGames(accountsResponse.data);
+  }, []);
 
   useEffect(() => {
     setPostsUser([]);
@@ -812,6 +858,7 @@ const Profile: React.FC = () => {
       <Modal
         isOpen={isOpenPreferencesInfoModal}
         onRequestClose={toggleOpenPreferencesInfoModal}
+        onAfterOpen={() => handleLoadPreferences()}
         style={{
           content: {
             height: 'max-content',
@@ -851,6 +898,11 @@ const Profile: React.FC = () => {
                         }`}
                         valueAccount={item}
                         placeholder="Username"
+                        username={
+                          accountsGamesUser.find(
+                            (obj) => obj.id_company === item.id,
+                          )?.username
+                        }
                       />
                     );
                   })}
@@ -867,7 +919,7 @@ const Profile: React.FC = () => {
                   id="demo-multiple-chip"
                   multiple
                   placeholder="Selecione suas preferências"
-                  defaultValue={[]}
+                  defaultValue={categoriesGameSelected}
                   value={categoriesGameSelected}
                   onChange={handleChangeSelect}
                   input={

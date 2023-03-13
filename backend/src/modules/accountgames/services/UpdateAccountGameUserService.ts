@@ -1,4 +1,5 @@
 import { inject, injectable } from 'tsyringe';
+import IUpdateAccountGameUserDTO from '../dtos/IUpdateAccountGameUserDTO';
 import AccountGameUser from '../infra/typeorm/entities/AccountGameUser';
 import IAccountGameUsersRepository from '../repositories/IAccountGameUsersRepository';
 
@@ -46,7 +47,7 @@ export default class UpdateAccountGameUserService {
       accountsToSave,
     );
     const resultUpdate = await this.accountGameUsersRepository.updateAll(
-      accountsToUpdate,
+      accountsToUpdate as IUpdateAccountGameUserDTO[],
     );
 
     return [...resultSave, ...resultUpdate];
