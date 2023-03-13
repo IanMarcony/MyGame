@@ -84,6 +84,22 @@ export const HeaderInfoProfile = styled.div`
   display: flex;
 `;
 
+export const HeaderPreferencesProfile = styled.header`
+  width: 100%;
+  display: flex;
+
+  button {
+    margin-left: auto;
+    border-radius: 10px;
+    padding: 5px;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+`;
+
 export const UserExtrasProfile = styled.div`
   width: 50%;
   padding: 5px;
@@ -113,7 +129,7 @@ export const ActionsProfileArea = styled.div`
 
 export const PreferencesArea = styled.div`
   margin-top: 10px;
-  width: 48%;
+  width: 50%;
   flex-direction: column;
   border-radius: 10px;
   padding: 10px;
@@ -157,12 +173,17 @@ export const PreferencesArea = styled.div`
 
 export const AccountsPreferencesArea = styled.div`
   display: flex;
+  flex-direction: column;
   margin-top: 10px;
   width: 60%;
   border-radius: 10px;
   justify-content: space-between;
   padding: 10px;
   background-color: var(--background-secondary-color);
+  > div {
+    display: flex;
+    flex: 1;
+  }
 `;
 
 export const FriendsListArea = styled.div`
@@ -230,7 +251,8 @@ export const FriendsListArea = styled.div`
 
 export const AccountsGamesArea = styled.div`
   margin-top: 10px;
-  width: 48%;
+  margin-left: 10px;
+  width: 50%;
   flex-direction: column;
   border-radius: 10px;
   padding: 10px;

@@ -5,6 +5,7 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
+  SelectChangeEvent,
 } from '@mui/material';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Waypoint } from 'react-waypoint';
@@ -15,6 +16,9 @@ import Modal from 'react-modal';
 import { FiBookOpen, FiUser } from 'react-icons/fi';
 import { BsUpload } from 'react-icons/bs';
 import { AiFillCloseCircle } from 'react-icons/ai';
+import * as Yup from 'yup';
+import { format, parseISO, sub } from 'date-fns';
+
 import BannerIcon from '../../assets/banner.jpg';
 import UserIcon from '../../assets/user.png';
 import Posts from '../../components/Post';
@@ -34,6 +38,7 @@ import {
   FormBasicInfo,
   FriendsListArea,
   HeaderInfoProfile,
+  HeaderPreferencesProfile,
   ImageBannerArea,
   ImageProfileArea,
   InputImagesArea,
@@ -100,13 +105,31 @@ interface IPosts {
   user: IUser;
 }
 
+interface IRequestBasicInfoSubmit {
+  name: string;
+  description: string;
+  birth_date: string;
+}
+
+interface ICategoriesGame {
+  id: number;
+  value: string;
+}
+
+interface IAccountGame {
+  id: number;
+  url_icon: string;
+  company: string;
+}
+
 const Profile: React.FC = () => {
   const { email } = useParams();
-  const { user, token } = useAuth();
+  const { user, token, updateUser } = useAuth();
   const [bannerIcon, setBannerIcon] = useState(BannerIcon);
   const [userIcon, setUserIcon] = useState(UserIcon);
   const [descriptionUser, setDescriptionUser] = useState('');
   const [nameUser, setNameUser] = useState('');
+  const [birthDateUser, setBirthDateUser] = useState('');
 
   const [isSelfUser, setIsSelfUser] = useState(true);
 
@@ -135,11 +158,31 @@ const Profile: React.FC = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
+  const [categoriesGame, setCategoriesGame] = useState<ICategoriesGame[]>([]);
+  const [accountGames, setAccountGames] = useState<IAccountGame[]>([]);
+  const [categoriesGameSelected, setCategoriesGameSelected] = useState<
+    string[]
+  >([]);
+
+  const getStyles = useCallback((name: string, arr: readonly string[]) => {
+    return {
+      fontWeight: arr.indexOf(name) === -1 ? 400 : 500,
+      backgroundColor: arr.indexOf(name) === -1 ? '#353B50' : '#454D6B',
+      color: arr.indexOf(name) === -1 ? '#D6D7DC' : '#FFF8EC',
+    };
+  }, []);
+
   const [isOpenBasicInfoModal, setIsOpenBasicInfoModal] = useState(false);
+  const [isOpenPreferencesInfoModal, setIsOpenPreferencesInfoModal] =
+    useState(false);
 
   const toggleOpenBasicInfoModal = useCallback(() => {
     setIsOpenBasicInfoModal(!isOpenBasicInfoModal);
   }, [isOpenBasicInfoModal]);
+
+  const toggleOpenPreferencesInfoModal = useCallback(() => {
+    setIsOpenPreferencesInfoModal(!isOpenPreferencesInfoModal);
+  }, [isOpenPreferencesInfoModal]);
 
   const handleLoadPosts = useCallback(
     async (id_user: number) => {
@@ -206,6 +249,7 @@ const Profile: React.FC = () => {
     setUserId(userData.id);
 
     setNameUser(userData.name);
+    setBirthDateUser(format(parseISO(userData.birth_date), 'dd-MM-yyyy'));
 
     if (userData.description) {
       setDescriptionUser(userData.description);
@@ -294,12 +338,100 @@ const Profile: React.FC = () => {
     setTypeButtonShow(1);
   }, [token, userId]);
 
+  const handleImagesSubmit = useCallback(async () => {
+    const config = {
+      headers: {
+        authorization: `Bearer ${token}`,
+        'content-type': 'multipart/form-data',
+      },
+    };
+
+    const formData = new FormData();
+    formData.append('profile_image', imageProfile || '');
+    formData.append('banner_image', imageBanner || '');
+
+    const { data: userData } = await api.patch(
+      '/users/images',
+      formData,
+      config,
+    );
+
+    if (userData.url_banner_photo) {
+      setBannerIcon(
+        `${process.env.REACT_APP_API_URL}/files/${userData.url_banner_photo}`,
+      );
+      setPreviewUrlImageBanner(
+        `${process.env.REACT_APP_API_URL}/files/${userData.url_banner_photo}`,
+      );
+    }
+
+    if (userData.url_profile_photo) {
+      setUserIcon(
+        `${process.env.REACT_APP_API_URL}/files/${userData.url_profile_photo}`,
+      );
+      setPreviewUrlImageProfile(
+        `${process.env.REACT_APP_API_URL}/files/${userData.url_profile_photo}`,
+      );
+    }
+
+    updateUser(userData);
+  }, [imageBanner, imageProfile, token, updateUser]);
+
   const handleBasicInfoSubmit = useCallback(
-    async (data: any) => {
-      toggleOpenBasicInfoModal();
+    async (data: IRequestBasicInfoSubmit) => {
+      try {
+        const schema = Yup.object().shape({
+          name: Yup.string().required('Nome obrigatório'),
+          birth_date: Yup.string().required('Data de nascimento obrigatória'),
+          description: Yup.string(),
+        });
+
+        await schema.validate(data, { abortEarly: false });
+
+        const dateTenYears = sub(new Date(), {
+          years: 10,
+        });
+        const birthDate_aux = new Date(data.birth_date);
+
+        if (birthDate_aux.getFullYear() > dateTenYears.getFullYear()) {
+          throw new Error('Deve ser uma data de pelo menos 10 anos atrás');
+        }
+
+        Object.assign(data, {
+          birth_date: data.birth_date.replaceAll('/', '-'),
+        });
+
+        const response = await api.put('/users', data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (imageProfile !== null || imageBanner !== null) {
+          handleImagesSubmit();
+        }
+
+        updateUser(response.data);
+
+        setNameUser(data.name);
+        setDescriptionUser(data.description);
+
+        toggleOpenBasicInfoModal();
+      } catch (e) {
+        console.log(`Error: ${e}`);
+      }
     },
-    [toggleOpenBasicInfoModal],
+    [
+      handleImagesSubmit,
+      imageBanner,
+      imageProfile,
+      toggleOpenBasicInfoModal,
+      token,
+      updateUser,
+    ],
   );
+
+  const handlePreferencesInfoSubmit = useCallback(async () => {}, []);
 
   const handleFileProfile = useCallback((file: File | null) => {
     setImageProfile(file);
@@ -353,6 +485,21 @@ const Profile: React.FC = () => {
     // eslint-disable-next-line no-unused-expressions
     fileImageBannerInput.current && fileImageBannerInput.current.click();
   }, [fileImageBannerInput]);
+
+  const handleChangeSelect = useCallback(
+    (event: SelectChangeEvent<typeof categoriesGameSelected>) => {
+      const {
+        target: { value: selectedValue },
+      } = event;
+
+      setCategoriesGameSelected(
+        typeof selectedValue === 'string'
+          ? selectedValue.split(',')
+          : selectedValue,
+      );
+    },
+    [],
+  );
 
   useEffect(() => {
     setPostsUser([]);
@@ -449,30 +596,42 @@ const Profile: React.FC = () => {
       </ContentProfile>
 
       <AccountsPreferencesArea>
-        <PreferencesArea>
-          <h3>Preferências</h3>
-          <ul>
-            {preferencesUser.map((item) => (
-              <li key={item.id}>{item.value}</li>
-            ))}
-          </ul>
-        </PreferencesArea>
-
-        <AccountsGamesArea>
-          <h3>Contas de Jogos</h3>
-          {accountsGamesUser.length === 0 ? (
-            <span>Sem contas registradas</span>
-          ) : (
+        <HeaderPreferencesProfile>
+          {isSelfUser && (
+            <button
+              type="button"
+              onClick={() => toggleOpenPreferencesInfoModal()}
+            >
+              Alterar
+            </button>
+          )}
+        </HeaderPreferencesProfile>
+        <div>
+          <PreferencesArea>
+            <h3>Preferências</h3>
             <ul>
-              {accountsGamesUser.map((item) => (
-                <li key={item.id}>
-                  <img src={item.url_icon} alt={item.company} />
-                  {item.username}
-                </li>
+              {preferencesUser.map((item) => (
+                <li key={item.id}>{item.value}</li>
               ))}
             </ul>
-          )}
-        </AccountsGamesArea>
+          </PreferencesArea>
+
+          <AccountsGamesArea>
+            <h3>Contas de Jogos</h3>
+            {accountsGamesUser.length === 0 ? (
+              <span>Sem contas registradas</span>
+            ) : (
+              <ul>
+                {accountsGamesUser.map((item) => (
+                  <li key={item.id}>
+                    <img src={item.url_icon} alt={item.company} />
+                    {item.username}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </AccountsGamesArea>
+        </div>
       </AccountsPreferencesArea>
 
       <PostsArea>
@@ -581,7 +740,7 @@ const Profile: React.FC = () => {
               defaultValue={descriptionUser}
             />
 
-            <DateInput name="birth_date" />
+            <DateInput name="birth_date" value={birthDateUser} />
 
             {/* <h2 className="preferences">Agora fale um pouco mais sobre você</h2>
 
@@ -642,6 +801,100 @@ const Profile: React.FC = () => {
               </Select>
             </>
           )} */}
+
+            <button type="submit">Atualizar dados</button>
+          </FormBasicInfo>
+        </ModalContainer>
+      </Modal>
+
+      <Modal
+        isOpen={isOpenPreferencesInfoModal}
+        onRequestClose={toggleOpenPreferencesInfoModal}
+        style={{
+          content: {
+            height: 'max-content',
+            padding: 0,
+            borderRadius: '10px',
+            border: '2px solid var(--text-color)',
+          },
+          overlay: {
+            backgroundColor: '#342e2ed3',
+          },
+        }}
+      >
+        <ModalContainer>
+          <ModalHeader>
+            <h2>Atualize suas informações</h2>
+            <button
+              type="button"
+              onClick={() => toggleOpenPreferencesInfoModal()}
+            >
+              <AiFillCloseCircle />
+            </button>
+          </ModalHeader>
+          <FormBasicInfo onSubmit={handlePreferencesInfoSubmit}>
+            {accountGames && (
+              <>
+                <h3>
+                  Insira o username das contas de jogos para compartilhar com
+                  amigos, se não tiver não se preocupe, não é obrigatório
+                </h3>
+                <AccountsContainer>
+                  {accountGames.map((item) => {
+                    return (
+                      <AccountInput
+                        key={item.id}
+                        name={`account_${item.company.toLowerCase()}_${
+                          item.id
+                        }`}
+                        valueAccount={item}
+                        placeholder="Username"
+                      />
+                    );
+                  })}
+                </AccountsContainer>
+              </>
+            )}
+
+            {categoriesGame && (
+              <>
+                {' '}
+                <h3>Selecione pelo menos uma preferência</h3>
+                <Select
+                  labelId="demo-multiple-chip-label"
+                  id="demo-multiple-chip"
+                  multiple
+                  placeholder="Selecione suas preferências"
+                  defaultValue={[]}
+                  value={categoriesGameSelected}
+                  onChange={handleChangeSelect}
+                  input={
+                    <OutlinedInput id="select-multiple-chip" label="Chip" />
+                  }
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((value, index) => (
+                        // eslint-disable-next-line react/no-array-index-key
+                        <Chip key={index} label={value} />
+                      ))}
+                    </Box>
+                  )}
+                >
+                  {categoriesGame.map((category) => (
+                    <MenuItem
+                      key={category.id}
+                      value={`${category.id}-${category.value}`}
+                      style={getStyles(
+                        `${category.id}-${category.value}`,
+                        categoriesGameSelected,
+                      )}
+                    >
+                      {category.value}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </>
+            )}
 
             <button type="submit">Atualizar dados</button>
           </FormBasicInfo>

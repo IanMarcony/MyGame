@@ -16,15 +16,18 @@ import { Container } from './styles';
 
 interface InputProps {
   name: string;
+  value?: string;
 }
 
-const DateInput: React.FC<InputProps> = ({ name }) => {
+const DateInput: React.FC<InputProps> = ({ name, value: valueDate }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
   const { fieldName, defaultValue, error, registerField } = useField(name);
 
-  const [value, setValue] = useState<Date | null>(null);
+  const [value, setValue] = useState<Date | null>(() => {
+    return valueDate ? new Date(valueDate) : null;
+  });
 
   const handleInputFocus = useCallback(() => setIsFocused(true), []);
 
