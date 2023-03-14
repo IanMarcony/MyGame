@@ -33,3 +33,4 @@ export default class FilePost {
   @UpdateDateColumn()
   updated_at: Date;
 }
+

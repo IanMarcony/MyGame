@@ -135,6 +135,12 @@ export const UserInfoArea = styled(Link)`
   .MuiAvatar-root {
     margin-right: 10px;
   }
+
+  button {
+    border-radius: 50%;
+    padding: 5px;
+    margin-left: auto;
+  }
 `;
 
 export const CommentsArea = styled.div`

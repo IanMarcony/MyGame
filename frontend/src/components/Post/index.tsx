@@ -68,6 +68,7 @@ const Posts: React.FC<PostProps> = ({ value }) => {
   const [countLikes, setCountLikes] = useState(value.count_likes);
   const [countComments, setCountComments] = useState(value.count_comments);
   const [comments, setComments] = useState<IComments[]>(value.coments);
+  const [hiddenPost, setHiddenPost] = useState(false);
   const { token, user } = useAuth();
 
   const carrouselRef = useRef<HTMLDivElement>(null);
@@ -175,126 +176,156 @@ const Posts: React.FC<PostProps> = ({ value }) => {
     [comments, countComments, token, value.id],
   );
 
+  const handleDeletePost = useCallback(
+    async (id_post: number) => {
+      try {
+        await api.delete(`/posts`, {
+          params: { id_post },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setHiddenPost(true);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [token],
+  );
+
   return (
-    <Container>
-      <UserInfoArea to={`/dashboard/profile/${value.user.email}`}>
-        <Avatar
-          alt="Foto de perfil"
-          src={
-            value.user.url_profile_photo
-              ? `${process.env.REACT_APP_API_URL}/files/${value.user.url_profile_photo}`
-              : UserIcon
-          }
-          sx={{ width: 35, height: 35 }}
-        />
+    <>
+      {!hiddenPost && (
+        <Container>
+          <UserInfoArea to={`/dashboard/profile/${value.user.email}`}>
+            <Avatar
+              alt="Foto de perfil"
+              src={
+                value.user.url_profile_photo
+                  ? `${process.env.REACT_APP_API_URL}/files/${value.user.url_profile_photo}`
+                  : UserIcon
+              }
+              sx={{ width: 35, height: 35 }}
+            />
 
-        {value.user.name}
-      </UserInfoArea>
-      {value.filesPost.length > 0 && (
-        <CarrouselFiles ref={carrouselRef} onWheel={(e) => handleWheel(e)}>
-          {value.filesPost.length > 1 ? (
-            <ButtonCarrouselPrev type="button" onClick={handlePrevItem}>
-              <FiArrowLeft />
-            </ButtonCarrouselPrev>
-          ) : (
-            <></>
+            {value.user.name}
+            {value.user.email === user.email && (
+              <button type="button" onClick={() => handleDeletePost(value.id)}>
+                <AiOutlineDelete />
+              </button>
+            )}
+          </UserInfoArea>
+          {value.filesPost.length > 0 && (
+            <CarrouselFiles ref={carrouselRef} onWheel={(e) => handleWheel(e)}>
+              {value.filesPost.length > 1 ? (
+                <ButtonCarrouselPrev type="button" onClick={handlePrevItem}>
+                  <FiArrowLeft />
+                </ButtonCarrouselPrev>
+              ) : (
+                <></>
+              )}
+              {value.filesPost.map((item, index) => {
+                return (
+                  <ItemCarrousel key={item.id}>
+                    {item.type === 'image' ? (
+                      <img
+                        src={`${process.env.REACT_APP_API_URL}/files/${item.filename}`}
+                        alt={item.filename}
+                      />
+                    ) : (
+                      <video
+                        src={`${process.env.REACT_APP_API_URL}/files/${item.filename}`}
+                        controls
+                      >
+                        Cannot played
+                      </video>
+                    )}
+                  </ItemCarrousel>
+                );
+              })}
+
+              {value.filesPost.length > 1 ? (
+                <ButtonCarrouselNext type="button" onClick={handleNextItem}>
+                  <FiArrowRight />
+                </ButtonCarrouselNext>
+              ) : (
+                <></>
+              )}
+            </CarrouselFiles>
           )}
-          {value.filesPost.map((item, index) => {
-            return (
-              <ItemCarrousel key={item.id}>
-                {item.type === 'image' ? (
-                  <img
-                    src={`${process.env.REACT_APP_API_URL}/files/${item.filename}`}
-                    alt={item.filename}
-                  />
-                ) : (
-                  <video
-                    src={`${process.env.REACT_APP_API_URL}/files/${item.filename}`}
-                    controls
-                  >
-                    Cannot played
-                  </video>
-                )}
-              </ItemCarrousel>
-            );
-          })}
 
-          {value.filesPost.length > 1 ? (
-            <ButtonCarrouselNext type="button" onClick={handleNextItem}>
-              <FiArrowRight />
-            </ButtonCarrouselNext>
-          ) : (
-            <></>
+          <p>{value.description}</p>
+
+          <ActionsPostArea>
+            <InfoPost>
+              <span>
+                {countLikes} {countLikes > 1 ? 'curtidas' : 'curtida'}
+              </span>
+              <span>
+                {countComments}{' '}
+                {countComments > 1 ? 'comentários' : 'comentario'}
+              </span>
+            </InfoPost>
+
+            <ActionsButtonArea>
+              <button type="button" onClick={() => handleLikePost()}>
+                {isLiked ? <AiFillLike /> : <AiOutlineLike />}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleToggleAddCommentArea()}
+              >
+                <FaComment />
+              </button>
+            </ActionsButtonArea>
+          </ActionsPostArea>
+
+          {comments.length > 0 && (
+            <CommentsArea>
+              {comments.map((item) => (
+                <CommentItem key={item.id}>
+                  <section>
+                    <UserInfoCommentArea
+                      to={`/dashboard/profile/${item.user.email}`}
+                    >
+                      <Avatar
+                        alt="Foto de perfil"
+                        src={
+                          item.user.url_profile_photo
+                            ? `${process.env.REACT_APP_API_URL}/files/${item.user.url_profile_photo}`
+                            : UserIcon
+                        }
+                        sx={{ width: 35, height: 35 }}
+                      />
+
+                      {item.user.name}
+                    </UserInfoCommentArea>
+                    {item.user.email === user.email && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteComment(item.id)}
+                      >
+                        <AiOutlineDelete />
+                      </button>
+                    )}
+                  </section>
+                  <p>{item.text}</p>
+                </CommentItem>
+              ))}
+            </CommentsArea>
           )}
-        </CarrouselFiles>
+
+          {isHiddenAddComment && (
+            <AddCommentArea onSubmit={handleSubmitComment}>
+              <TextAreaInput placeholder="Comente algo..." name="text" />
+              <button type="submit">
+                <BsSend />
+              </button>
+            </AddCommentArea>
+          )}
+        </Container>
       )}
-
-      <p>{value.description}</p>
-
-      <ActionsPostArea>
-        <InfoPost>
-          <span>
-            {countLikes} {countLikes > 1 ? 'curtidas' : 'curtida'}
-          </span>
-          <span>
-            {countComments} {countComments > 1 ? 'comentários' : 'comentario'}
-          </span>
-        </InfoPost>
-
-        <ActionsButtonArea>
-          <button type="button" onClick={() => handleLikePost()}>
-            {isLiked ? <AiFillLike /> : <AiOutlineLike />}
-          </button>
-          <button type="button" onClick={() => handleToggleAddCommentArea()}>
-            <FaComment />
-          </button>
-        </ActionsButtonArea>
-      </ActionsPostArea>
-
-      {comments.length > 0 && (
-        <CommentsArea>
-          {comments.map((item) => (
-            <CommentItem key={item.id}>
-              <section>
-                <UserInfoCommentArea
-                  to={`/dashboard/profile/${item.user.email}`}
-                >
-                  <Avatar
-                    alt="Foto de perfil"
-                    src={
-                      item.user.url_profile_photo
-                        ? `${process.env.REACT_APP_API_URL}/files/${item.user.url_profile_photo}`
-                        : UserIcon
-                    }
-                    sx={{ width: 35, height: 35 }}
-                  />
-
-                  {item.user.name}
-                </UserInfoCommentArea>
-                {item.user.email === user.email && (
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteComment(item.id)}
-                  >
-                    <AiOutlineDelete />
-                  </button>
-                )}
-              </section>
-              <p>{item.text}</p>
-            </CommentItem>
-          ))}
-        </CommentsArea>
-      )}
-
-      {isHiddenAddComment && (
-        <AddCommentArea onSubmit={handleSubmitComment}>
-          <TextAreaInput placeholder="Comente algo..." name="text" />
-          <button type="submit">
-            <BsSend />
-          </button>
-        </AddCommentArea>
-      )}
-    </Container>
+    </>
   );
 };
 

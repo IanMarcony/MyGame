@@ -19,4 +19,5 @@ export default interface IInteractionsRepository {
     id_user: number,
     action: 'COMMENT' | 'LIKE',
   ): Promise<void>;
+  deleteByIdPost(id_post: number): Promise<void>;
 }
