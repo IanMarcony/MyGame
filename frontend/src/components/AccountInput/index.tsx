@@ -14,10 +14,12 @@ interface IAccountGame {
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   valueAccount: IAccountGame;
+  username?: string;
 }
 
 const AccountInput: React.FC<InputProps> = ({
   valueAccount,
+  username,
   name,
   ...rest
 }) => {
@@ -35,7 +37,7 @@ const AccountInput: React.FC<InputProps> = ({
   return (
     <Container>
       <img src={valueAccount.url_icon} alt={valueAccount.company} />
-      <input ref={inputRef} defaultValue={defaultValue} {...rest} />
+      <input ref={inputRef} defaultValue={username || defaultValue} {...rest} />
     </Container>
   );
 };

@@ -23,6 +23,7 @@ interface IPosts {
   id_user: number;
   description: string;
   filesPost: IFilePost[];
+  is_private: boolean;
   is_liked: boolean;
   count_likes: number;
   count_comments: number;

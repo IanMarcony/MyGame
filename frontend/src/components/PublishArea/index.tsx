@@ -14,9 +14,11 @@ import api from '../../services/api';
 import TextAreaInput from '../TextAreaInput';
 
 import {
+  AddPostButton,
   ButtonCarrouselNext,
   ButtonCarrouselPrev,
   CarrouselFiles,
+  Content,
   Container,
   DropFilesArea,
   ItemCarrousel,
@@ -29,8 +31,13 @@ const PublishArea: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrlFiles, setPreviewUrlFiles] = useState<string[]>([]);
   const [isPostPublic, setViewPost] = useState(1);
+  const [isHiddenForm, setIsHiddenForm] = useState(true);
 
   const { token, user } = useAuth();
+  const toggleOpenForm = useCallback(() => {
+    setIsHiddenForm(!isHiddenForm);
+  }, [isHiddenForm]);
+
   const { addNewPosts } = usePostsHome();
 
   const handleSubmit = useCallback(
@@ -54,15 +61,18 @@ const PublishArea: React.FC = () => {
 
         const newPost = {
           ...response.data,
+          coments: [],
           user,
         };
 
         addNewPosts(newPost);
+
+        toggleOpenForm();
       } catch (error) {
         console.log(error);
       }
     },
-    [addNewPosts, files, isPostPublic, token, user],
+    [isPostPublic, token, user, addNewPosts, toggleOpenForm, files],
   );
 
   const handleFiles = useCallback(
@@ -148,85 +158,96 @@ const PublishArea: React.FC = () => {
   }, []);
 
   return (
-    <Container onSubmit={handleSubmit}>
-      {files.length > 0 && (
-        <CarrouselFiles ref={carrouselRef} onWheel={(e) => handleWheel(e)}>
-          {files.length > 1 ? (
-            <ButtonCarrouselPrev type="button" onClick={handlePrevItem}>
-              <FiArrowLeft />
-            </ButtonCarrouselPrev>
-          ) : (
-            <></>
-          )}
-          {files.map((item, index) => {
-            return (
-              <ItemCarrousel key={item.name + index}>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveFileUploaded(index)}
-                >
-                  <MdRemoveCircle />
-                </button>
-                {item.type.includes('image') ? (
-                  <img src={previewUrlFiles[index]} alt={item.name} />
-                ) : (
-                  // eslint-disable-next-line jsx-a11y/media-has-caption
-                  <video src={previewUrlFiles[index]} controls>
-                    Cannot played
-                  </video>
-                )}
-              </ItemCarrousel>
-            );
-          })}
+    <Container>
+      <AddPostButton type="button" onClick={() => toggleOpenForm()}>
+        {isHiddenForm ? 'Nova publicação' : 'Fechar'}
+      </AddPostButton>
 
-          {files.length > 1 ? (
-            <ButtonCarrouselNext type="button" onClick={handleNextItem}>
-              <FiArrowRight />
-            </ButtonCarrouselNext>
-          ) : (
-            <></>
+      {!isHiddenForm && (
+        <Content onSubmit={handleSubmit}>
+          {files.length > 0 && (
+            <CarrouselFiles ref={carrouselRef} onWheel={(e) => handleWheel(e)}>
+              {files.length > 1 ? (
+                <ButtonCarrouselPrev type="button" onClick={handlePrevItem}>
+                  <FiArrowLeft />
+                </ButtonCarrouselPrev>
+              ) : (
+                <></>
+              )}
+              {files.map((item, index) => {
+                return (
+                  <ItemCarrousel key={item.name + index}>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFileUploaded(index)}
+                    >
+                      <MdRemoveCircle />
+                    </button>
+                    {item.type.includes('image') ? (
+                      <img src={previewUrlFiles[index]} alt={item.name} />
+                    ) : (
+                      // eslint-disable-next-line jsx-a11y/media-has-caption
+                      <video src={previewUrlFiles[index]} controls>
+                        Cannot played
+                      </video>
+                    )}
+                  </ItemCarrousel>
+                );
+              })}
+
+              {files.length > 1 ? (
+                <ButtonCarrouselNext type="button" onClick={handleNextItem}>
+                  <FiArrowRight />
+                </ButtonCarrouselNext>
+              ) : (
+                <></>
+              )}
+            </CarrouselFiles>
           )}
-        </CarrouselFiles>
+
+          <Select
+            value={isPostPublic.toString()}
+            onChange={handleChangeViewPost}
+          >
+            <MenuItem value={1}>
+              <MdPublic />
+              Público
+            </MenuItem>
+            <MenuItem value={0}>
+              <FiLock />
+              Somente Amigos
+            </MenuItem>
+          </Select>
+
+          <TextAreaInput
+            rows={4}
+            placeholder="Poste alguma coisa..."
+            name="text_post"
+          />
+
+          <DropFilesArea
+            onDragOver={handleOnDragOver}
+            onDrop={handleOnDropFiles}
+            onClick={handleFilesClick}
+          >
+            <p>
+              Arraste e solte alguma imagem ou vídeo <BsUpload />{' '}
+            </p>
+            <input
+              type="file"
+              multiple
+              accept="image/png, image/jpeg, video/* "
+              ref={filesInput}
+              hidden
+              onChange={(e) =>
+                handleFormatOnChangeInput(e.target.files && e.target.files)
+              }
+            />
+          </DropFilesArea>
+
+          <button type="submit">Postar</button>
+        </Content>
       )}
-
-      <Select value={isPostPublic.toString()} onChange={handleChangeViewPost}>
-        <MenuItem value={1}>
-          <MdPublic />
-          Público
-        </MenuItem>
-        <MenuItem value={0}>
-          <FiLock />
-          Somente Amigos
-        </MenuItem>
-      </Select>
-
-      <TextAreaInput
-        rows={4}
-        placeholder="Poste alguma coisa..."
-        name="text_post"
-      />
-
-      <DropFilesArea
-        onDragOver={handleOnDragOver}
-        onDrop={handleOnDropFiles}
-        onClick={handleFilesClick}
-      >
-        <p>
-          Arraste e solte alguma imagem ou vídeo <BsUpload />{' '}
-        </p>
-        <input
-          type="file"
-          multiple
-          accept="image/png, image/jpeg, video/* "
-          ref={filesInput}
-          hidden
-          onChange={(e) =>
-            handleFormatOnChangeInput(e.target.files && e.target.files)
-          }
-        />
-      </DropFilesArea>
-
-      <button type="submit">Postar</button>
     </Container>
   );
 };

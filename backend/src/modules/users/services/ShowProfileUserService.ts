@@ -3,6 +3,7 @@ import AppError from '@shared/errors/AppError';
 import IUserRepository from '../repositories/IUsersRepository';
 import { inject, injectable } from 'tsyringe';
 import IFriendRequestsRepository from '../repositories/IFriendRequestsRepository';
+import IFriendsRepository from '../repositories/IFriendsRepository';
 
 interface IRequest {
   id_user: number;
@@ -15,6 +16,8 @@ export default class ShowProfileUserService {
     private usersRepository: IUserRepository,
     @inject('FriendRequestsRepository')
     private friendRequestsRepository: IFriendRequestsRepository,
+    @inject('FriendsRepository')
+    private friendsRepository: IFriendsRepository,
   ) {}
 
   async execute({ email, id_user }: IRequest): Promise<User> {
@@ -24,14 +27,25 @@ export default class ShowProfileUserService {
     }
 
     if (user.id !== id_user) {
-      const requestFriend =
-        await this.friendRequestsRepository.findByUserAndUserRequired(
-          id_user,
-          user.id,
-        );
+      const isFriend = await this.friendsRepository.findFriend(
+        id_user,
+        user.id,
+      );
+
       Object.assign(user, {
-        isRequested: !!requestFriend,
+        is_friend: isFriend,
       });
+      if (!isFriend) {
+        const requestFriend =
+          await this.friendRequestsRepository.findByUserAndUserRequired(
+            id_user,
+            user.id,
+          );
+        Object.assign(user, {
+          is_requested: !!requestFriend,
+          id_request: requestFriend?.id,
+        });
+      }
     }
 
     return user;

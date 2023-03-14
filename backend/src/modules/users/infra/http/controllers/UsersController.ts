@@ -72,11 +72,11 @@ export default class UsersController {
 
     const searchUser = container.resolve(SearchUsersService);
 
-    await searchUser.execute({
+    const users = await searchUser.execute({
       username: (username as string) || '',
     });
 
-    return res.status(200).json({});
+    return res.status(200).json(users);
   }
 
   public async show(req: Request, res: Response): Promise<Response> {
@@ -89,6 +89,8 @@ export default class UsersController {
       email,
       id_user,
     });
+
+    delete profile.password;
 
     return res.status(200).json(profile);
   }

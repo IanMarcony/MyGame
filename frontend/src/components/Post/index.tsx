@@ -95,7 +95,6 @@ const Posts: React.FC<PostProps> = ({ value }) => {
     await api.put(
       '/posts/likes',
       {
-        id_user: value.id_user,
         id_post: value.id,
       },
       {
@@ -108,7 +107,7 @@ const Posts: React.FC<PostProps> = ({ value }) => {
     const like = !isLiked;
     setLiked(like);
     like ? setCountLikes(countLikes + 1) : setCountLikes(countLikes - 1);
-  }, [value.id_user, value.id, token, isLiked, countLikes]);
+  }, [value.id, token, isLiked, countLikes]);
 
   const handleToggleAddCommentArea = useCallback(() => {
     setIsHiddenAddComment(!isHiddenAddComment);

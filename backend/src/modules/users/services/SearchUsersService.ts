@@ -13,6 +13,18 @@ export default class SearchUsersService {
   ) {}
 
   async execute({ username }: IRequest): Promise<User[]> {
-    return await this.usersRepository.findAllByName(username);
+    const users = await this.usersRepository.findAllByName(username);
+
+    for (const user of users) {
+      delete user.password;
+      delete user.id;
+      delete user.url_banner_photo;
+      delete user.birth_date;
+      delete user.description;
+      delete user.created_at;
+      delete user.updated_at;
+    }
+
+    return users;
   }
 }

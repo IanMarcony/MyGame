@@ -12,7 +12,9 @@ export default class UsersRepository implements IUserRepository {
   }
 
   public async findAllByName(name: string): Promise<User[]> {
-    const user = await this.ormRepository.find({ where: { name: Like(name) } });
+    const user = await this.ormRepository.find({
+      where: { name: Like(`${name}%`) },
+    });
 
     return user;
   }
@@ -27,8 +29,12 @@ export default class UsersRepository implements IUserRepository {
     const user = await this.ormRepository.findOne({
       where: { email },
       relations: {
-        account_games_users: true,
-        preferences: true,
+        account_games_users: {
+          account_game: true,
+        },
+        preferences: {
+          account_game: true,
+        },
         followers: true,
       },
     });

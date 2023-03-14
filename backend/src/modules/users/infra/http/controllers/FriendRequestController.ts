@@ -23,9 +23,12 @@ export default class FriendRequestController {
 
     const createFriendRequest = container.resolve(AddFriendRequestService);
 
-    await createFriendRequest.execute({ email_friend, id_user });
+    const id_request = await createFriendRequest.execute({
+      email_friend,
+      id_user,
+    });
 
-    return res.status(204).json({});
+    return res.status(201).json({ id_request });
   }
 
   public async update(req: Request, res: Response): Promise<Response> {

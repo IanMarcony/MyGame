@@ -4,9 +4,9 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100%;
+  height: 100vh;
   padding: 10px;
-  overflow-y: auto;
+  overflow-x: none;
 `;
 
 export const PostsArea = styled.div`
@@ -15,6 +15,5 @@ export const PostsArea = styled.div`
   align-items: center;
   width: 45%;
   margin-top: 30px;
-  overflow-y: none;
   overflow-x: none;
 `;

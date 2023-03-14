@@ -18,6 +18,7 @@ export default class AccountGameUserController {
   public async update(req: Request, res: Response): Promise<Response> {
     const { id: id_user } = req.user;
     const { accounts } = req.body;
+
     const updateAccountGameUserService = container.resolve(
       UpdateAccountGameUserService,
     );
@@ -30,3 +31,4 @@ export default class AccountGameUserController {
     return res.status(200).json(accountGameUsers);
   }
 }
+

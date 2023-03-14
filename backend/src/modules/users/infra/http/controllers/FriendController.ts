@@ -4,11 +4,15 @@ import { container } from 'tsyringe';
 
 export default class FriendController {
   public async delete(req: Request, res: Response): Promise<Response> {
-    const { id_user, id_friend } = req.body;
+    const { id_friend } = req.query;
+    const { id: id_user } = req.user;
 
     const deleteFriend = container.resolve(DeleteFriendService);
 
-    await deleteFriend.execute({ id_user, id_friend });
+    await deleteFriend.execute({
+      id_user,
+      id_friend: parseInt(id_friend as string),
+    });
 
     return res.status(204).json({});
   }
