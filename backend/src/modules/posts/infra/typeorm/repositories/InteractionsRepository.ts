@@ -14,6 +14,13 @@ export default class InteractionsRepository implements IInteractionsRepository {
       AppDataSource.getRepository(InteractionUser);
     this.ormRepositoryAction = AppDataSource.getRepository(ActionUser);
   }
+  public async deleteByIdPost(id_post: number): Promise<void> {
+    await this.ormRepositoryInteraction
+      .createQueryBuilder()
+      .delete()
+      .where('id_post = :id_post ', { id_post })
+      .execute();
+  }
 
   public async create({
     action_user,
@@ -83,3 +90,4 @@ export default class InteractionsRepository implements IInteractionsRepository {
       .execute();
   }
 }
+

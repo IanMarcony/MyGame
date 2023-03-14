@@ -10,6 +10,13 @@ export default class FilesPostRepository implements IFilesPostRepository {
   constructor() {
     this.ormRepository = AppDataSource.getRepository(FilePost);
   }
+  public async deleteByIdPost(id_post: number): Promise<void> {
+    await this.ormRepository
+      .createQueryBuilder()
+      .delete()
+      .where('id_post = :id_post', { id_post })
+      .execute();
+  }
 
   public async create(datas: ICreateFilePostDTO[]): Promise<FilePost[]> {
     const files = this.ormRepository.create(datas);
@@ -31,3 +38,4 @@ export default class FilesPostRepository implements IFilesPostRepository {
     return comments;
   }
 }
+

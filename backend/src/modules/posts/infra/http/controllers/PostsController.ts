@@ -68,12 +68,12 @@ export default class PostsController {
   }
 
   public async delete(req: Request, res: Response): Promise<Response> {
-    const { id_post } = req.body;
+    const { id_post } = req.query;
 
     const deletePost = container.resolve(DeletePostService);
 
     await deletePost.execute({
-      id_post,
+      id_post: parseInt(id_post as string),
     });
 
     return res.status(204).json({});
@@ -95,3 +95,4 @@ export default class PostsController {
     return res.status(200).json(posts);
   }
 }
+

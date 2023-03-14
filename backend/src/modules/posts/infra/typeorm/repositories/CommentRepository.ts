@@ -10,6 +10,13 @@ export default class CommentRepository implements ICommentRepository {
   constructor() {
     this.ormRepository = AppDataSource.getRepository(CommentUser);
   }
+  public async deleteByIdPost(id_post: number): Promise<void> {
+    await this.ormRepository
+      .createQueryBuilder()
+      .delete()
+      .where('id_post = :id_post', { id_post })
+      .execute();
+  }
 
   public async create(data: ICreateCommentDTO): Promise<CommentUser> {
     const comment = this.ormRepository.create(data);
@@ -31,3 +38,4 @@ export default class CommentRepository implements ICommentRepository {
     return comments;
   }
 }
+

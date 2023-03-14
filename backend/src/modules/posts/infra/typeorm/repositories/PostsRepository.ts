@@ -43,7 +43,12 @@ export default class PostsRepository implements IPostsRepository {
       .execute();
   }
   public async findById(id: number): Promise<Post | null> {
-    const post = await this.ormRepository.findOne({ where: { id } });
+    const post = await this.ormRepository.findOne({
+      where: { id },
+      relations: {
+        filesPost: true,
+      },
+    });
 
     return post;
   }
@@ -84,3 +89,4 @@ export default class PostsRepository implements IPostsRepository {
     };
   }
 }
+
