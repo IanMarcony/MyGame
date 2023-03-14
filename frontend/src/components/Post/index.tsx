@@ -2,21 +2,25 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable jsx-a11y/media-has-caption */
 /* eslint-disable react/no-array-index-key */
-import React, { useRef, useState, useCallback } from 'react';
-import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
+import { Avatar } from '@mui/material';
+import React, { useCallback, useRef, useState } from 'react';
 import {
   AiFillLike,
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlineLike,
 } from 'react-icons/ai';
-import { FaComment } from 'react-icons/fa';
-import { Avatar } from '@mui/material';
 import { BsSend } from 'react-icons/bs';
-import Modal from 'react-modal';
+import { FaComment } from 'react-icons/fa';
+import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 import UserIcon from '../../assets/user.png';
+import { useAuth } from '../../hooks/auth';
+import api from '../../services/api';
+import AlterPost from '../AlterPost';
+import TextAreaInput from '../TextAreaInput';
 import {
   ActionsButtonArea,
+  ActionsButtonPostArea,
   ActionsPostArea,
   AddCommentArea,
   ButtonCarrouselNext,
@@ -25,16 +29,12 @@ import {
   CommentItem,
   CommentsArea,
   Container,
+  HeaderPost,
   InfoPost,
   ItemCarrousel,
   UserInfoArea,
   UserInfoCommentArea,
 } from './styles';
-import api from '../../services/api';
-import { useAuth } from '../../hooks/auth';
-import TextAreaInput from '../TextAreaInput';
-import AlterPost from '../AlterPost';
-import { useModalEditPost } from '../../hooks/modal.edit.post';
 
 interface IUser {
   url_profile_photo?: string;
@@ -81,7 +81,11 @@ const Posts: React.FC<PostProps> = ({ value }) => {
   const [descriptionPost, setDescriptionPost] = useState(value.description);
 
   const { token, user } = useAuth();
-  const { isOpenEditPostModal, toggleOpenEditPostModal } = useModalEditPost();
+  const [isOpenEditPostModal, setIsOpenEditPostModal] = useState(false);
+
+  const toggleOpenEditPostModal = useCallback(() => {
+    setIsOpenEditPostModal(!isOpenEditPostModal);
+  }, [isOpenEditPostModal]);
 
   const carrouselRef = useRef<HTMLDivElement>(null);
   const handleWheel = useCallback(
@@ -221,20 +225,22 @@ const Posts: React.FC<PostProps> = ({ value }) => {
     <>
       {!hiddenPost && (
         <Container>
-          <UserInfoArea to={`/dashboard/profile/${value.user.email}`}>
-            <Avatar
-              alt="Foto de perfil"
-              src={
-                value.user.url_profile_photo
-                  ? `${process.env.REACT_APP_API_URL}/files/${value.user.url_profile_photo}`
-                  : UserIcon
-              }
-              sx={{ width: 35, height: 35 }}
-            />
+          <HeaderPost>
+            <UserInfoArea to={`/dashboard/profile/${value.user.email}`}>
+              <Avatar
+                alt="Foto de perfil"
+                src={
+                  value.user.url_profile_photo
+                    ? `${process.env.REACT_APP_API_URL}/files/${value.user.url_profile_photo}`
+                    : UserIcon
+                }
+                sx={{ width: 35, height: 35 }}
+              />
 
-            {value.user.name}
+              {value.user.name}
+            </UserInfoArea>
             {value.user.email === user.email && (
-              <div id="actions">
+              <ActionsButtonPostArea>
                 <button
                   type="button"
                   onClick={() => handleDeletePost(value.id)}
@@ -244,9 +250,9 @@ const Posts: React.FC<PostProps> = ({ value }) => {
                 <button type="button" onClick={() => toggleOpenEditPostModal()}>
                   <AiOutlineEdit />
                 </button>
-              </div>
+              </ActionsButtonPostArea>
             )}
-          </UserInfoArea>
+          </HeaderPost>
           {value.filesPost.length > 0 && (
             <CarrouselFiles ref={carrouselRef} onWheel={(e) => handleWheel(e)}>
               {value.filesPost.length > 1 ? (
@@ -360,6 +366,7 @@ const Posts: React.FC<PostProps> = ({ value }) => {
             isOpen={isOpenEditPostModal}
             onRequestClose={toggleOpenEditPostModal}
             onAfterClose={handleReloadPost}
+            toggleOpenEditPostModal={toggleOpenEditPostModal}
             style={{
               content: {
                 height: 'max-content',

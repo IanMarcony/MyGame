@@ -88,7 +88,7 @@ const Home: React.FC = () => {
         {posts.map((item, i) => {
           return (
             <>
-              <Posts key={uuid()} value={item} />
+              <Posts key={item.id} value={item} />
               {i === posts.length - posts.length * 0.5 && (
                 <Waypoint onEnter={() => setPage(page + 1)} />
               )}
