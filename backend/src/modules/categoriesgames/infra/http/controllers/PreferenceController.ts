@@ -5,7 +5,7 @@ import { container } from 'tsyringe';
 export default class PreferenceController {
   public async update(req: Request, res: Response): Promise<Response> {
     const { id: id_user } = req.user;
-    const { preferences_add, preferences_delete } = req.body;
+    const { preferences } = req.body;
 
     const updatePreferencesService = container.resolve(
       UpdatePreferencesService,
@@ -13,10 +13,10 @@ export default class PreferenceController {
 
     await updatePreferencesService.execute({
       id_user,
-      preferences_add,
-      preferences_delete,
+      preferences,
     });
 
     return res.status(204).json({});
   }
 }
+

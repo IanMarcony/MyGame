@@ -10,6 +10,13 @@ export default class PreferenceRepository implements IPreferenceRepository {
   constructor() {
     this.ormRepository = AppDataSource.getRepository(Preference);
   }
+  public async deleteByIdUser(id_user: number): Promise<void> {
+    await this.ormRepository
+      .createQueryBuilder()
+      .delete()
+      .where('id_user = :id_user', { id_user })
+      .execute();
+  }
 
   public async create(datas: ICreatePreferenceDTO[]): Promise<Preference[]> {
     const preferences = this.ormRepository.create(datas);
@@ -25,3 +32,4 @@ export default class PreferenceRepository implements IPreferenceRepository {
       .execute();
   }
 }
+

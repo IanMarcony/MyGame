@@ -8,4 +8,6 @@ export default interface IAccountGameUsersRepository {
   update(data: AccountGameUser): Promise<AccountGameUser>;
   updateAll(datas: IUpdateAccountGameUserDTO[]): Promise<AccountGameUser[]>;
   delete(id_account: number): Promise<void>;
+  deleteByIdUser(id_user: number): Promise<void>;
 }
+

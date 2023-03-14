@@ -5,7 +5,6 @@ import IAccountGameUsersRepository from '../repositories/IAccountGameUsersReposi
 
 interface IAccountGameUser {
   username: string;
-  id_account_game_user?: number;
   id_account_game: number;
 }
 
@@ -22,34 +21,20 @@ export default class UpdateAccountGameUserService {
   ) {}
 
   async execute({ accounts, id_user }: IRequest): Promise<AccountGameUser[]> {
-    const accountsToSave = accounts
-      .filter((item) => item.id_account_game_user === undefined)
-      .map((item) => {
-        return {
-          username: item.username,
-          id_account_game: item.id_account_game,
-          id_user,
-        };
-      });
+    await this.accountGameUsersRepository.deleteByIdUser(id_user);
 
-    const accountsToUpdate = accounts
-      .filter((item) => item.id_account_game_user !== undefined)
-      .map((item) => {
-        return {
-          username: item.username,
-          id_account_game: item.id_account_game,
-          id: item.id_account_game_user,
-          id_user,
-        };
-      });
+    const accountsToSave = accounts.map(({ id_account_game, username }) => {
+      return {
+        username,
+        id_account_game,
+        id_user,
+      };
+    });
 
     const resultSave = await this.accountGameUsersRepository.create(
       accountsToSave,
     );
-    const resultUpdate = await this.accountGameUsersRepository.updateAll(
-      accountsToUpdate as IUpdateAccountGameUserDTO[],
-    );
 
-    return [...resultSave, ...resultUpdate];
+    return resultSave;
   }
 }

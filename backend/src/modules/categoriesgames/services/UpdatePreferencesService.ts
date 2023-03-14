@@ -8,8 +8,7 @@ interface IPreference {
 
 interface IRequest {
   id_user: number;
-  preferences_delete: number[];
-  preferences_add: IPreference[];
+  preferences: IPreference[];
 }
 
 @injectable()
@@ -19,30 +18,16 @@ export default class UpdatePreferencesService {
     private preferencesRepository: IPreferenceRepository,
   ) {}
 
-  async execute({
-    preferences_add,
-    preferences_delete,
-    id_user,
-  }: IRequest): Promise<void> {
-    let preferences_saved: Preference[] = [];
+  async execute({ preferences, id_user }: IRequest): Promise<void> {
+    await this.preferencesRepository.deleteByIdUser(id_user);
 
-    if (preferences_add.length > 0) {
-      const dataPreferences = preferences_add.map((item) => {
-        return {
-          ...item,
-          id_user,
-        };
-      });
-      preferences_saved = await this.preferencesRepository.create(
-        dataPreferences,
-      );
-    }
+    const dataPreferences = preferences.map((item) => {
+      return {
+        ...item,
+        id_user,
+      };
+    });
 
-    if (preferences_delete.length > 0) {
-      for (let index = 0; index < preferences_delete.length; index++) {
-        const idPreference = preferences_delete[index];
-        await this.preferencesRepository.delete(idPreference);
-      }
-    }
+    await this.preferencesRepository.create(dataPreferences);
   }
 }

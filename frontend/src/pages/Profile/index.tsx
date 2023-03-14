@@ -447,27 +447,95 @@ const Profile: React.FC = () => {
 
   const handlePreferencesInfoSubmit = useCallback(
     async (data: any) => {
-      console.log(data);
+      if (categoriesGameSelected.length < 1) {
+        alert('Selecione pelo menos uma preferência');
+        return;
+      }
+      try {
+        const preferences = categoriesGameSelected.map((item) => {
+          return {
+            id_category_game: parseInt(item.split('-')[0], 10),
+          };
+        });
 
-      const preferencesUserSave = categoriesGameSelected.map((item) => {
-        return {
-          id_category_game: parseInt(item.split('-')[0], 10),
-        };
-      });
+        await api.put(
+          '/preferences/users',
+          {
+            preferences,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
 
-      const keysFromDataSubmit = Object.keys(data);
-      const keysAccountsGame = keysFromDataSubmit.filter(
-        (item) => item.includes('account_') && data[item] !== '',
-      );
+        setPreferencesUser(
+          categoriesGameSelected.map((item) => {
+            const [id, value] = item.split('-');
 
-      const accountsGameUser = keysAccountsGame.map((item) => {
-        return {
-          username: data[item],
-          id_account_game: parseInt(item.split('_')[2], 10),
-        };
-      });
+            return {
+              id: parseInt(id, 10),
+              value,
+            };
+          }),
+        );
+
+        const keysFromDataSubmit = Object.keys(data);
+        const keysAccountsGame = keysFromDataSubmit.filter(
+          (item) => item.includes('account_') && data[item] !== '',
+        );
+
+        const accounts = keysAccountsGame.map((item) => {
+          return {
+            username: data[item],
+            id_account_game: parseInt(item.split('_')[2], 10),
+          };
+        });
+
+        const { data: accountsSaved } = await api.put(
+          '/accountgames/users',
+          {
+            accounts,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        setAccountsGamesUser(
+          accountsSaved.map(
+            (item: {
+              id_account_game: number;
+              username: string;
+              id: number;
+            }) => {
+              const company = accountGames.find(
+                (obj) => obj.id === item.id_account_game,
+              );
+              return {
+                username: item.username,
+                id: item.id,
+                id_company: company?.id,
+                url_icon: company?.url_icon,
+                company: company?.company,
+              };
+            },
+          ),
+        );
+        toggleOpenPreferencesInfoModal();
+      } catch (err) {
+        console.error(err);
+      }
     },
-    [categoriesGameSelected],
+    [
+      categoriesGameSelected,
+      token,
+      toggleOpenPreferencesInfoModal,
+      accountGames,
+    ],
   );
 
   const handleFileProfile = useCallback((file: File | null) => {
@@ -789,66 +857,6 @@ const Profile: React.FC = () => {
             />
 
             <DateInput name="birth_date" value={birthDateUser} />
-
-            {/* <h2 className="preferences">Agora fale um pouco mais sobre você</h2>
-
-          {accountGames && (
-            <>
-              <h3>
-                Insira o username das contas de jogos para compartilhar com
-                amigos, se não tiver não se preocupe, não é obrigatório
-              </h3>
-              <AccountsContainer>
-                {accountGames.map((item) => {
-                  return (
-                    <AccountInput
-                      key={item.id}
-                      name={`account_${item.company.toLowerCase()}_${item.id}`}
-                      valueAccount={item}
-                      placeholder="Username"
-                    />
-                  );
-                })}
-              </AccountsContainer>
-            </>
-          )}
-
-          {categoriesGame && (
-            <>
-              {' '}
-              <h3>Selecione pelo menos uma preferência</h3>
-              <Select
-                labelId="demo-multiple-chip-label"
-                id="demo-multiple-chip"
-                multiple
-                placeholder="Selecione suas preferências"
-                defaultValue={[]}
-                value={categoriesGameSelected}
-                onChange={handleChange}
-                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-                renderValue={(selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selected.map((value, index) => (
-                      <Chip key={index} label={value} />
-                    ))}
-                  </Box>
-                )}
-              >
-                {categoriesGame.map((category) => (
-                  <MenuItem
-                    key={category.id}
-                    value={`${category.id}-${category.value}`}
-                    style={getStyles(
-                      `${category.id}-${category.value}`,
-                      categoriesGameSelected,
-                    )}
-                  >
-                    {category.value}
-                  </MenuItem>
-                ))}
-              </Select>
-            </>
-          )} */}
 
             <button type="submit">Atualizar dados</button>
           </FormBasicInfo>

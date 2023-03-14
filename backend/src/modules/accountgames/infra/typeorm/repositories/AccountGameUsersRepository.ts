@@ -13,6 +13,14 @@ export default class AccountGameUsersRepository
   constructor() {
     this.ormRepository = AppDataSource.getRepository(AccountGameUser);
   }
+
+  public async deleteByIdUser(id_user: number): Promise<void> {
+    await this.ormRepository
+      .createQueryBuilder()
+      .delete()
+      .where('id_user = :id_user', { id_user })
+      .execute();
+  }
   public async findAllByIdUser(id_user: number): Promise<AccountGameUser[]> {
     const accountGameUsers = await this.ormRepository.find({
       where: { id_user },
@@ -46,3 +54,4 @@ export default class AccountGameUsersRepository
       .execute();
   }
 }
+
