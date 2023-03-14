@@ -4,10 +4,16 @@
 /* eslint-disable react/no-array-index-key */
 import React, { useRef, useState, useCallback } from 'react';
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
-import { AiFillLike, AiOutlineDelete, AiOutlineLike } from 'react-icons/ai';
+import {
+  AiFillLike,
+  AiOutlineDelete,
+  AiOutlineEdit,
+  AiOutlineLike,
+} from 'react-icons/ai';
 import { FaComment } from 'react-icons/fa';
 import { Avatar } from '@mui/material';
 import { BsSend } from 'react-icons/bs';
+import Modal from 'react-modal';
 import UserIcon from '../../assets/user.png';
 import {
   ActionsButtonArea,
@@ -27,6 +33,8 @@ import {
 import api from '../../services/api';
 import { useAuth } from '../../hooks/auth';
 import TextAreaInput from '../TextAreaInput';
+import AlterPost from '../AlterPost';
+import { useModalEditPost } from '../../hooks/modal.edit.post';
 
 interface IUser {
   url_profile_photo?: string;
@@ -52,6 +60,7 @@ interface IPosts {
   description: string;
   filesPost: IFilePost[];
   is_liked: boolean;
+  is_private: boolean;
   count_likes: number;
   count_comments: number;
   coments: IComments[];
@@ -69,7 +78,10 @@ const Posts: React.FC<PostProps> = ({ value }) => {
   const [countComments, setCountComments] = useState(value.count_comments);
   const [comments, setComments] = useState<IComments[]>(value.coments);
   const [hiddenPost, setHiddenPost] = useState(false);
+  const [descriptionPost, setDescriptionPost] = useState(value.description);
+
   const { token, user } = useAuth();
+  const { isOpenEditPostModal, toggleOpenEditPostModal } = useModalEditPost();
 
   const carrouselRef = useRef<HTMLDivElement>(null);
   const handleWheel = useCallback(
@@ -193,6 +205,18 @@ const Posts: React.FC<PostProps> = ({ value }) => {
     [token],
   );
 
+  const handleReloadPost = useCallback(async () => {
+    const { data: postReload } = await api.get('/posts', {
+      params: {
+        id_post: value.id,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setDescriptionPost(postReload.description);
+  }, [token, value.id]);
+
   return (
     <>
       {!hiddenPost && (
@@ -210,9 +234,17 @@ const Posts: React.FC<PostProps> = ({ value }) => {
 
             {value.user.name}
             {value.user.email === user.email && (
-              <button type="button" onClick={() => handleDeletePost(value.id)}>
-                <AiOutlineDelete />
-              </button>
+              <div id="actions">
+                <button
+                  type="button"
+                  onClick={() => handleDeletePost(value.id)}
+                >
+                  <AiOutlineDelete />
+                </button>
+                <button type="button" onClick={() => toggleOpenEditPostModal()}>
+                  <AiOutlineEdit />
+                </button>
+              </div>
             )}
           </UserInfoArea>
           {value.filesPost.length > 0 && (
@@ -254,7 +286,7 @@ const Posts: React.FC<PostProps> = ({ value }) => {
             </CarrouselFiles>
           )}
 
-          <p>{value.description}</p>
+          <p>{descriptionPost}</p>
 
           <ActionsPostArea>
             <InfoPost>
@@ -323,6 +355,26 @@ const Posts: React.FC<PostProps> = ({ value }) => {
               </button>
             </AddCommentArea>
           )}
+
+          <AlterPost
+            isOpen={isOpenEditPostModal}
+            onRequestClose={toggleOpenEditPostModal}
+            onAfterClose={handleReloadPost}
+            style={{
+              content: {
+                height: 'max-content',
+                padding: '15px',
+                borderRadius: '10px',
+                border: '2px solid var(--text-color)',
+                margin: '4% auto 0 auto',
+                width: '80%',
+              },
+              overlay: {
+                backgroundColor: '#342e2ed3',
+              },
+            }}
+            value={value}
+          />
         </Container>
       )}
     </>
