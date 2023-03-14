@@ -15,7 +15,6 @@ import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';
 import TextAreaInput from '../TextAreaInput';
 
-import { useModalEditPost } from '../../hooks/modal.edit.post';
 import { Container, Content, Header } from './styles';
 
 interface IFilePost {
@@ -34,13 +33,17 @@ interface IPost {
 
 interface AlterPostProps extends Props {
   value: IPost;
+  toggleOpenEditPostModal(): void;
 }
 
-const AlterPost: React.FC<AlterPostProps> = ({ value: valuePost, ...rest }) => {
+const AlterPost: React.FC<AlterPostProps> = ({
+  value: valuePost,
+  toggleOpenEditPostModal,
+  ...rest
+}) => {
   const [isPostPublic, setViewPost] = useState(valuePost.is_private ? 0 : 1);
 
   const { token } = useAuth();
-  const { toggleOpenEditPostModal } = useModalEditPost();
 
   const handleSubmit = useCallback(
     async (data: any) => {

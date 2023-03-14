@@ -12,6 +12,12 @@ export const Container = styled.div`
   background-color: var(--background-secondary-color);
 `;
 
+export const HeaderPost = styled.header`
+  width: 100%;
+  display: flex;
+  align-items: center;
+`;
+
 export const CarrouselFiles = styled.div`
   display: flex;
   width: 100%;
@@ -135,9 +141,12 @@ export const UserInfoArea = styled(Link)`
   .MuiAvatar-root {
     margin-right: 10px;
   }
-  #actions {
-    margin-left: auto;
-  }
+`;
+
+export const ActionsButtonPostArea = styled.div`
+  margin-left: auto;
+  display: flex;
+
   button + button {
     margin-left: 5px;
   }
