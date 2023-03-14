@@ -32,8 +32,9 @@ interface IPosts {
 }
 
 interface PostsHomeContextData {
-  getPosts(): IPosts[];
+  posts: IPosts[];
   addLastPosts(newPosts: IPosts[]): void;
+  addAllPosts(newPosts: IPosts[]): void;
   addNewPosts(newPost: IPosts): void;
 }
 
@@ -48,10 +49,21 @@ const PostsHomeProvider: React.FC<PostsHomeProviderProps> = ({ children }) => {
 
   const addLastPosts = useCallback(
     (newPosts: IPosts[]) => {
-      setPosts([...posts, ...newPosts]);
+      const temp = [...posts, ...newPosts];
+
+      setPosts(
+        temp.filter(
+          (value, index, self) =>
+            index === self.findIndex((t) => t.id === value.id),
+        ),
+      );
     },
     [posts],
   );
+
+  const addAllPosts = useCallback((newPosts: IPosts[]) => {
+    setPosts(newPosts);
+  }, []);
 
   const addNewPosts = useCallback(
     (newPost: IPosts) => {
@@ -60,12 +72,10 @@ const PostsHomeProvider: React.FC<PostsHomeProviderProps> = ({ children }) => {
     [posts],
   );
 
-  const getPosts = useCallback(() => {
-    return posts;
-  }, [posts]);
-
   return (
-    <PostsHomeContext.Provider value={{ addLastPosts, addNewPosts, getPosts }}>
+    <PostsHomeContext.Provider
+      value={{ addAllPosts, addLastPosts, addNewPosts, posts }}
+    >
       {children}
     </PostsHomeContext.Provider>
   );

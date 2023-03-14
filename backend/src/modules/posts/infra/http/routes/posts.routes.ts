@@ -14,6 +14,7 @@ const postsController = new PostsController();
 const upload = multer(uploadConfig);
 
 postsRouter.get('/:page', ensureAuthenticated, postsController.index);
+postsRouter.get('/', ensureAuthenticated, postsController.show);
 postsRouter.post(
   '/',
   ensureAuthenticated,
@@ -21,7 +22,7 @@ postsRouter.post(
   postsController.create,
 );
 postsRouter.delete('/', ensureAuthenticated, postsController.delete);
-postsRouter.put('/', ensureAuthenticated, upload.any(), postsController.update);
+postsRouter.put('/', ensureAuthenticated, postsController.update);
 postsRouter.post('/comments', ensureAuthenticated, commentController.create);
 postsRouter.delete('/comments', ensureAuthenticated, commentController.delete);
 postsRouter.put('/likes', ensureAuthenticated, likesController.update);

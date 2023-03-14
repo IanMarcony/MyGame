@@ -52,6 +52,21 @@ export default class PostsRepository implements IPostsRepository {
 
     return post;
   }
+  public async findByIdAll(id: number): Promise<Post | null> {
+    const post = await this.ormRepository.findOne({
+      where: { id },
+      relations: {
+        interactions: {
+          action_user: true,
+        },
+        coments: { user: true },
+        filesPost: true,
+        user: true,
+      },
+    });
+
+    return post;
+  }
   public async findByPageOrUser(
     page: number,
     id_user?: number | undefined,
@@ -89,4 +104,3 @@ export default class PostsRepository implements IPostsRepository {
     };
   }
 }
-

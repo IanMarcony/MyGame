@@ -4,6 +4,7 @@ import ListPostsServices from '@modules/posts/services/ListPostsService';
 import UpdatePostService from '@modules/posts/services/UpdatePostService';
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
+import PostsRepository from '../../typeorm/repositories/PostsRepository';
 
 export default class PostsController {
   public async create(req: Request, res: Response): Promise<Response> {
@@ -33,35 +34,13 @@ export default class PostsController {
   }
 
   public async update(req: Request, res: Response): Promise<Response> {
-    const { id_post, description, is_private, files_id_delete } = req.body;
-
-    const filesUpload = req.files as Express.Multer.File[];
-    const files_to_delete = filesUpload
-      .filter((item) => item.fieldname.split('_')[0] === 'delete')
-      .map((item, index) => {
-        return {
-          id: files_id_delete[index],
-          filename: item.filename,
-          type: item.mimetype.includes('video') ? 'video' : 'image',
-        };
-      });
-    const files_to_save = filesUpload
-      .filter((item) => item.fieldname.split('_')[0] === 'save')
-      .map((item) => {
-        return {
-          filename: item.filename,
-          type: item.mimetype.includes('video') ? 'video' : 'image',
-        };
-      });
-
+    const { id_post, description, is_private } = req.body;
     const updatePost = container.resolve(UpdatePostService);
 
     const post = await updatePost.execute({
       id_post,
       description,
       is_private,
-      files_to_delete,
-      files_to_save,
     });
 
     return res.status(200).json(post);
@@ -94,5 +73,39 @@ export default class PostsController {
 
     return res.status(200).json(posts);
   }
-}
 
+  public async show(req: Request, res: Response): Promise<Response> {
+    const { id_post } = req.query;
+    const { id: id_user_logged } = req.user;
+    const postsRepository = new PostsRepository();
+    const post = await postsRepository.findByIdAll(parseInt(id_post as string));
+
+    if (post) {
+      delete post.user.password;
+      delete post.user.id;
+      delete post.user.url_banner_photo;
+      delete post.user.birth_date;
+      delete post.user.description;
+      delete post.user.created_at;
+      delete post.user.updated_at;
+
+      for (const comment of post.coments) {
+        delete comment.user.password;
+        delete comment.user.id;
+        delete comment.user.url_banner_photo;
+        delete comment.user.birth_date;
+        delete comment.user.description;
+        delete comment.user.created_at;
+        delete comment.user.updated_at;
+      }
+
+      const is_liked = !!post?.interactions.find(
+        (item) =>
+          item.id_user === id_user_logged && item.action_user.type === 'LIKE',
+      );
+      Object.assign(post, { count_comments: post.coments.length, is_liked });
+    }
+
+    return res.status(200).json(post);
+  }
+}
