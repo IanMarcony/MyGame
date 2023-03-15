@@ -39,6 +39,9 @@ export default class FriendRequestsRepository
   public async findAll(id_user: number): Promise<FriendRequest[]> {
     return await this.ormRepository.find({
       where: { id_user_required: id_user },
+      relations: {
+        userRequester: true,
+      },
     });
   }
 
