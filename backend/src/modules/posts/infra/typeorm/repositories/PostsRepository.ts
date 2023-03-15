@@ -1,4 +1,4 @@
-import { IsNull, Not, Repository } from 'typeorm';
+import { IsNull, Not, Repository, LessThanOrEqual } from 'typeorm';
 import { AppDataSource } from 'data-source';
 import IPostsRepository from '@modules/posts/repositories/IPostsRepository';
 import Post from '../entities/Post';
@@ -87,6 +87,7 @@ export default class PostsRepository implements IPostsRepository {
       order: { created_at: 'DESC' },
       where: {
         id_user: id_user ? id_user : Not(IsNull()),
+        created_at: LessThanOrEqual(new Date()),
       },
       relations: {
         interactions: {

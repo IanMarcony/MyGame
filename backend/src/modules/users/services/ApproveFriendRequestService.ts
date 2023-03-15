@@ -27,5 +27,7 @@ export default class ApproveFriendRequestService {
       requestFriend.id_user_requester,
       requestFriend.id_user_required,
     );
+
+    await this.friendRequestsRepository.deleteById(id_request);
   }
 }
