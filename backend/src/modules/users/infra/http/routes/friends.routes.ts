@@ -15,6 +15,11 @@ friendRouter.delete(
   ensureAuthenticated,
   friendRequestController.delete,
 );
+friendRouter.get(
+  '/request',
+  ensureAuthenticated,
+  friendRequestController.index,
+);
 friendRouter.post(
   '/request',
   ensureAuthenticated,

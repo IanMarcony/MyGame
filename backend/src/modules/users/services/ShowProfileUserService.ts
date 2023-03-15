@@ -26,6 +26,16 @@ export default class ShowProfileUserService {
       throw new AppError('Profile not found', 404);
     }
 
+    for (const friend of user.followers) {
+      delete friend.password;
+      delete friend.id;
+      delete friend.url_banner_photo;
+      delete friend.birth_date;
+      delete friend.description;
+      delete friend.created_at;
+      delete friend.updated_at;
+    }
+
     if (user.id !== id_user) {
       const isFriend = await this.friendsRepository.findFriend(
         id_user,

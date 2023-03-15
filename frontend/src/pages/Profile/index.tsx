@@ -291,6 +291,7 @@ const Profile: React.FC = () => {
         },
       ),
     );
+    setFriends(userData.followers);
 
     const { is_friend, is_requested, id_request } = userData;
 
