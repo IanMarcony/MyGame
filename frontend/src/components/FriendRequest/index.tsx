@@ -1,8 +1,10 @@
 /* eslint-disable react/jsx-no-useless-fragment */
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { GiCancel, GiConfirmed } from 'react-icons/gi';
 import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';
+
+import UserIcon from '../../assets/user.png';
 
 import {
   ActionsButtonsArea,
@@ -59,7 +61,11 @@ const FriendRequest: React.FC<FriendRequestProps> = ({ request }) => {
         <Container>
           <UserImageArea>
             <img
-              src={`${process.env.REACT_APP_API_URL}/files/${request.userRequester.url_profile_photo}`}
+              src={
+                request.userRequester.url_profile_photo
+                  ? `${process.env.REACT_APP_API_URL}/files/${request.userRequester.url_profile_photo}`
+                  : UserIcon
+              }
               alt={request.userRequester.name}
             />
           </UserImageArea>
