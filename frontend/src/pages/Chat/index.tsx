@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { format, intervalToDuration, parseISO } from 'date-fns';
 import { Waypoint } from 'react-waypoint';
@@ -16,11 +16,12 @@ import {
 
 import UserIcon from '../../assets/user.png';
 import api from '../../services/api';
+import socket from '../../services/socket';
 
 interface IMessageData {
   id: number;
   text: string;
-  email: string;
+  id_user: number;
   created_at: string;
 }
 
@@ -46,6 +47,7 @@ const Chat: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const messagesAreaRef = useRef<HTMLDivElement>(null);
 
   const verifyLastDateMessage = useCallback((message_date: string) => {
     const result = intervalToDuration({
@@ -100,28 +102,14 @@ const Chat: React.FC = () => {
         return;
       }
 
-      const { data: message } = await api.post(
-        '/chats/messages',
-        {
-          text: data.message,
-          id_chat: chatMetadata.id_chat,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      setMessages((old) => [
-        {
-          ...message,
-          email: user.email,
-        },
-        ...old,
-      ]);
+      socket.emit('message', {
+        text: data.message,
+        id_chat: chatMetadata.id_chat,
+        chat_token: id,
+        token: `Bearer ${token}`,
+      });
     },
-    [chatMetadata.id_chat, token, user.email],
+    [chatMetadata.id_chat, token, id],
   );
 
   const handleGetChat = useCallback(async () => {
@@ -143,14 +131,35 @@ const Chat: React.FC = () => {
         profile_photo: chat_user.url_profile_photo,
         id_chat: data.id_chat,
       });
+
+      socket.emit('select_room', {
+        token: id,
+        user,
+      });
     } catch (error) {
       navigate('/dashboard/chat');
     }
-  }, [id, token, user.email, navigate]);
+  }, [id, token, user, navigate]);
+
+  const handleMessagesListener = useCallback((data: IMessageData) => {
+    setMessages((old) => [data, ...old]);
+  }, []);
+
+  useEffect(() => {
+    socket.on('message', handleMessagesListener);
+
+    return () => {
+      socket.off('message', handleMessagesListener);
+    };
+  }, []);
+
+  useEffect(() => {
+    messagesAreaRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   useEffect(() => {
     handleGetChat();
-  }, [id]);
+  }, [handleGetChat, id]);
 
   useEffect(() => {
     handleLoadMessages();
@@ -172,18 +181,16 @@ const Chat: React.FC = () => {
 
         {chatMetadata.name}
       </ChatHeader>
-      <MessagesArea>
-        {messages.reverse().map((item, index) => (
+      <MessagesArea ref={messagesAreaRef}>
+        {messages.map((item, index) => (
           <>
-            <MessageCard
-              key={item.id}
-              isSelfMessage={item.email === user.email}
-            >
+            <MessageCard key={item.id} isSelfMessage={item.id_user === user.id}>
               {item.text}
               <span>{verifyLastDateMessage(item.created_at)}</span>
             </MessageCard>
             {index === messages.length - messages.length * 0.5 && (
-              <Waypoint onEnter={() => verifyLoadMessages()} />
+              // eslint-disable-next-line react/no-array-index-key
+              <Waypoint key={index} onEnter={() => verifyLoadMessages()} />
             )}
           </>
         ))}

@@ -1,7 +1,5 @@
-import AppError from '@shared/errors/AppError';
 import { inject, injectable } from 'tsyringe';
 import Message from '../infra/typeorm/entities/Message';
-import IChatsRepository from '../repositories/IChatsRepository';
 import IMessagesRepository from '../repositories/IMessagesRepository';
 
 interface IRequest {

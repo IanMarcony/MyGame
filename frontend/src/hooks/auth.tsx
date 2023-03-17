@@ -10,6 +10,7 @@ import api from '../services/api';
 import Constants from '../utils/Constants';
 
 interface IUser {
+  id: number;
   name: string;
   email: string;
   birth_date: string;
