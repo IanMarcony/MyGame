@@ -37,9 +37,15 @@ const Notifications: React.FC = () => {
   }, []);
   return (
     <Container>
-      {friendRequests.map((item) => (
-        <FriendRequest key={item.id} request={item} />
-      ))}
+      {friendRequests.length === 0 ? (
+        <h1>Sem notificações, fique relax</h1>
+      ) : (
+        <>
+          {friendRequests.map((item) => (
+            <FriendRequest key={item.id} request={item} />
+          ))}
+        </>
+      )}
     </Container>
   );
 };

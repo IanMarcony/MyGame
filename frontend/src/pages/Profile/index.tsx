@@ -648,7 +648,9 @@ const Profile: React.FC = () => {
             <ActionsProfileArea>
               {!isSelfUser && (
                 <>
-                  <button type="button">Envia mensagem</button>
+                  {typeButtonShow === 3 && (
+                    <button type="button">Envia mensagem</button>
+                  )}
 
                   {typeButtonShow === 1 && (
                     <button type="button" onClick={() => handleAddFriend()}>
