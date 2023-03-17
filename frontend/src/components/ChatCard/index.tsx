@@ -14,8 +14,8 @@ import {
 interface IContentChat {
   profile_photo?: string;
   name_chat: string;
-  last_message: string;
-  last_message_date: string;
+  last_message?: string;
+  last_message_date?: string;
   chat_id: string;
 }
 
@@ -24,10 +24,10 @@ interface ChatCardProps {
 }
 
 const ChatCard: React.FC<ChatCardProps> = ({ content }) => {
-  const verifyLastDateMessage = useCallback(() => {
+  const verifyLastDateMessage = useCallback((last_message_date: string) => {
     const result = intervalToDuration({
       start: new Date(),
-      end: new Date(content.last_message_date),
+      end: new Date(last_message_date),
     });
 
     const { years, days, months, seconds, hours, minutes } = result;
@@ -39,11 +39,11 @@ const ChatCard: React.FC<ChatCardProps> = ({ content }) => {
       return `Há ${years} anos`;
     }
     if ((months && months > 0) || (days && days > 2)) {
-      return format(parseISO(content.last_message_date), 'dd/MM');
+      return format(parseISO(last_message_date), 'dd/MM');
     }
 
     if (days && days === 1) {
-      return `Ontem às ${format(parseISO(content.last_message_date), 'HH:mm')}`;
+      return `Ontem às ${format(parseISO(last_message_date), 'HH:mm')}`;
     }
 
     if (days && days === 0) {
@@ -51,8 +51,8 @@ const ChatCard: React.FC<ChatCardProps> = ({ content }) => {
         return 'Agora';
       }
     }
-    return format(parseISO(content.last_message_date), 'HH:mm');
-  }, [content.last_message_date]);
+    return format(parseISO(last_message_date), 'HH:mm');
+  }, []);
 
   return (
     <Container to={`/dashboard/chat/${content.chat_id}`}>
@@ -68,10 +68,12 @@ const ChatCard: React.FC<ChatCardProps> = ({ content }) => {
       </UserImageArea>
       <Content>
         <h1>{content.name_chat}</h1>
-        <LastMessageChatArea>
-          <span>{content.last_message}</span>
-          {verifyLastDateMessage()}
-        </LastMessageChatArea>
+        {content.last_message && content.last_message_date && (
+          <LastMessageChatArea>
+            <span>{content.last_message}</span>
+            {verifyLastDateMessage(content.last_message_date)}
+          </LastMessageChatArea>
+        )}
       </Content>
     </Container>
   );

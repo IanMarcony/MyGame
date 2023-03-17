@@ -32,7 +32,7 @@ const SignIn: React.FC = () => {
         await signIn({ email: data.email, password: data.password });
         return nagivate('/dashboard');
       } catch (e) {
-        return alert('Erro ao processar dados');
+        return alert(`Erro ao processar dados ->${e}`);
       }
     },
     [signIn, nagivate],

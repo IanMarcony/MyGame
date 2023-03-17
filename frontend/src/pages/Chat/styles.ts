@@ -21,13 +21,16 @@ export const ChatHeader = styled(Link)`
   height: 12%;
   padding: 10px;
   display: flex;
+  align-items: center;
   text-decoration: none;
+  color: var(--text-color);
   border-bottom: 1px solid var(--text-color);
 `;
 
 export const UserImageArea = styled.div`
   width: 50px;
   height: 50px;
+  margin-right: 10px;
   border-radius: 50%;
   border: 1px solid var(--text-color);
   img {
@@ -78,6 +81,9 @@ export const MessageCard = styled.div<IMessageCardProps>`
   text-align: justify;
   border-radius: 10px;
   background-color: var(--background-color);
+  & + & {
+    margin-bottom: 10px;
+  }
   span {
     font-size: 12px;
     margin-left: auto;

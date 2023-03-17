@@ -25,12 +25,16 @@ export default class ChatUser {
   @Column()
   id_user_request: number;
 
+  @Column()
+  id_user_receiver: number;
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'id_user_request' })
   user_request: User;
 
-  @Column()
-  id_user_receiver: number;
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'id_user_receiver' })
+  user_receiver: User;
 
   @CreateDateColumn()
   created_at: Date;
