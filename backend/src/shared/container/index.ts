@@ -27,6 +27,10 @@ import IFriendRequestsRepository from '@modules/users/repositories/IFriendReques
 import FriendRequestsRepository from '@modules/users/infra/typeorm/repositories/FriendRequestsRepository';
 import IFriendsRepository from '@modules/users/repositories/IFriendsRepository';
 import FriendsRepository from '@modules/users/infra/typeorm/repositories/FriendsRepository';
+import IChatsRepository from '@modules/chat/repositories/IChatsRepository';
+import ChatsRepository from '@modules/chat/infra/typeorm/repositories/ChatsRepository';
+import IMessagesRepository from '@modules/chat/repositories/IMessagesRepository';
+import MessagesRepository from '@modules/chat/infra/typeorm/repositories/MessagesRepository';
 
 container.registerSingleton<IUsersRepository>(
   'UsersRepository',
@@ -86,4 +90,14 @@ container.registerSingleton<IFriendRequestsRepository>(
 container.registerSingleton<IFriendsRepository>(
   'FriendsRepository',
   FriendsRepository,
+);
+
+container.registerSingleton<IChatsRepository>(
+  'ChatsRepository',
+  ChatsRepository,
+);
+
+container.registerSingleton<IMessagesRepository>(
+  'MessagesRepository',
+  MessagesRepository,
 );

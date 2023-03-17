@@ -9,6 +9,7 @@ import categoriesRouter from '@modules/categoriesgames/infra/http/routes/categor
 import preferencesRouter from '@modules/categoriesgames/infra/http/routes/preferences.routes';
 import postsRouter from '@modules/posts/infra/http/routes/posts.routes';
 import friendRouter from '@modules/users/infra/http/routes/friends.routes';
+import chatRouter from '@modules/chat/infra/http/routes/chat.routes';
 
 const routes = Router();
 
@@ -21,5 +22,6 @@ routes.use('/categoriesgame', categoriesRouter);
 routes.use('/preferences/users', preferencesRouter);
 routes.use('/posts', postsRouter);
 routes.use('/friends', friendRouter);
+routes.use('/chats', chatRouter);
 
 export default routes;

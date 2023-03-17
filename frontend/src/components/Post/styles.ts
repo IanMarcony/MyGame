@@ -1,6 +1,6 @@
 import { Form } from '@unform/web';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 export const Container = styled.div`
   position: relative;
@@ -244,4 +244,100 @@ export const AddCommentArea = styled(Form)`
     height: 50px;
     margin-left: 5px;
   }
+`;
+
+export const ContainerModalUpdate = styled.div`
+  flex: 1;
+  display: flex;
+  background-color: var(--background-color);
+  padding: 15px;
+  flex-direction: column;
+`;
+
+const appearFromLeft = keyframes`
+  from{
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to{
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+export const HeaderUpdate = styled.header`
+  display: flex;
+  width: 100%;
+  text-align: center;
+  h1 {
+    margin: 0 auto;
+  }
+
+  button {
+    border-radius: 50%;
+    padding: 10px;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+`;
+
+export const ContentUpdate = styled(Form)`
+  position: relative;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  animation: ${appearFromLeft} 1s;
+  width: 100%;
+
+  > div {
+    margin-bottom: 10px;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    margin-top: 12px;
+
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .MuiInputBase-root {
+    width: max-content;
+    height: 35px;
+    border: 1px solid #232129;
+    color: var(--text-color);
+  }
+
+  .MuiSelect-select {
+    display: flex;
+    align-items: center;
+    svg {
+      margin-right: 5px;
+    }
+  }
+
+  .MuitMenuItem-root {
+    display: flex;
+    align-items: center;
+    svg {
+      margin-right: 5px;
+    }
+  }
+`;
+
+export const AddPostButtonUpdate = styled.button`
+  margin-bottom: 10px;
+  border-radius: 10px;
+  padding: 10px;
+  width: max-content;
+  font-size: 12px;
 `;

@@ -4,6 +4,7 @@ import ChangePassword from '../pages/ChangePassword';
 import Chat from '../pages/Chat';
 import ForgotPassword from '../pages/ForgotPassword';
 import Home from '../pages/Home';
+import ListChats from '../pages/ListChats';
 import Notifications from '../pages/Notifications';
 import PageNotFound from '../pages/PageNotFound';
 import Profile from '../pages/Profile';
@@ -23,7 +24,8 @@ const Routes: React.FC = () => {
         <Route index element={<Home />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="profile/:email" element={<Profile />} />
-        <Route path="chat" element={<Chat />} />
+        <Route path="chat" element={<ListChats />} />
+        <Route path="chat/:id" element={<Chat />} />
       </Route>
 
       <Route path="*" element={<PageNotFound />} />

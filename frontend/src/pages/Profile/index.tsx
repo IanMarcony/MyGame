@@ -10,7 +10,7 @@ import {
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Waypoint } from 'react-waypoint';
 
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import Modal from 'react-modal';
 import { FiBookOpen, FiUser } from 'react-icons/fi';
@@ -164,6 +164,7 @@ const Profile: React.FC = () => {
   const [categoriesGameSelected, setCategoriesGameSelected] = useState<
     string[]
   >([]);
+  const navigate = useNavigate();
 
   const getStyles = useCallback((name: string, arr: readonly string[]) => {
     return {
@@ -616,6 +617,26 @@ const Profile: React.FC = () => {
     setAccountGames(accountsResponse.data);
   }, []);
 
+  const handleSendMessage = useCallback(async () => {
+    try {
+      const { data: chatResponse } = await api.post(
+        '/chats',
+        {
+          id_user_receiver: userId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      navigate(`/dashboard/chat/${chatResponse.chat.token}`);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [navigate, token, userId]);
+
   useEffect(() => {
     setPostsUser([]);
     setTotal(0);
@@ -648,7 +669,11 @@ const Profile: React.FC = () => {
             <ActionsProfileArea>
               {!isSelfUser && (
                 <>
-                  <button type="button">Envia mensagem</button>
+                  {typeButtonShow === 3 && (
+                    <button type="button" onClick={() => handleSendMessage()}>
+                      Envia mensagem
+                    </button>
+                  )}
 
                   {typeButtonShow === 1 && (
                     <button type="button" onClick={() => handleAddFriend()}>
