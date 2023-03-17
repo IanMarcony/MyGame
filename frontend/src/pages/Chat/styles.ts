@@ -109,3 +109,10 @@ export const SendMessageArea = styled(Form)`
     }
   }
 `;
+
+export const NotificationTypingArea = styled.span`
+  display: inline-block;
+  max-width: 200px;
+  text-overflow: ellipsis;
+  word-wrap: normal;
+`;

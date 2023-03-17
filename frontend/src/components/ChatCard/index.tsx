@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { format, intervalToDuration, parseISO } from 'date-fns';
 
@@ -10,6 +10,8 @@ import {
   LastMessageChatArea,
   UserImageArea,
 } from './styles';
+import socket from '../../services/socket';
+import { useAuth } from '../../hooks/auth';
 
 interface IContentChat {
   profile_photo?: string;
@@ -19,18 +21,36 @@ interface IContentChat {
   chat_id: string;
 }
 
+interface ILastMessage {
+  text: string;
+  created_at: string;
+}
+
 interface ChatCardProps {
   content: IContentChat;
 }
 
+const timoutId: any = 0;
+
 const ChatCard: React.FC<ChatCardProps> = ({ content }) => {
+  const [lastMessage, setLastMessage] = useState(content.last_message);
+  const [lastMessageAux, setLastMessageAux] = useState(content.last_message);
+  const [lastMessageDate, setLastMessageDate] = useState(
+    content.last_message_date,
+  );
+  const [lastMessageDateAux, setLastMessageDateAux] = useState(
+    content.last_message_date,
+  );
+
+  const { user } = useAuth();
+
   const verifyLastDateMessage = useCallback((last_message_date: string) => {
     const result = intervalToDuration({
       start: new Date(),
       end: new Date(last_message_date),
     });
 
-    const { years, days, months, seconds, hours, minutes } = result;
+    const { years, days, months, hours, minutes } = result;
 
     if (years && years > 0) {
       if (years === 1) {
@@ -54,6 +74,33 @@ const ChatCard: React.FC<ChatCardProps> = ({ content }) => {
     return format(parseISO(last_message_date), 'HH:mm');
   }, []);
 
+  const handleTypingResponse = useCallback(
+    (data: ILastMessage) => {
+      if (data.text.length === 0) {
+        setLastMessage(lastMessageAux);
+      } else {
+        setLastMessage(data.text);
+      }
+    },
+    [lastMessageAux],
+  );
+
+  const handleSelectRoom = useCallback(() => {
+    socket.emit('select_room', {
+      token: content.chat_id,
+      user,
+    });
+  }, [content.chat_id, user]);
+
+  useEffect(() => {
+    handleSelectRoom();
+    socket.on('chatTyping', handleTypingResponse);
+
+    return () => {
+      socket.off('chatTyping', handleTypingResponse);
+    };
+  }, []);
+
   return (
     <Container to={`/dashboard/chat/${content.chat_id}`}>
       <UserImageArea>
@@ -68,10 +115,10 @@ const ChatCard: React.FC<ChatCardProps> = ({ content }) => {
       </UserImageArea>
       <Content>
         <h1>{content.name_chat}</h1>
-        {content.last_message && content.last_message_date && (
+        {lastMessage && lastMessageDate && (
           <LastMessageChatArea>
-            <span>{content.last_message}</span>
-            {verifyLastDateMessage(content.last_message_date)}
+            <span>{lastMessage}</span>
+            {verifyLastDateMessage(lastMessageDate)}
           </LastMessageChatArea>
         )}
       </Content>

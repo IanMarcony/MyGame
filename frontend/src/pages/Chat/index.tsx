@@ -10,6 +10,7 @@ import {
   Container,
   MessageCard,
   MessagesArea,
+  NotificationTypingArea,
   SendMessageArea,
   UserImageArea,
 } from './styles';
@@ -32,9 +33,17 @@ interface IChatMetadata {
   id_chat: number;
 }
 
+interface ITyping {
+  message: string;
+  token: string;
+  email: string;
+}
+
 interface ISubmitData {
   message: string;
 }
+
+let timeoutId: any = 0;
 
 const Chat: React.FC = () => {
   const { id } = useParams();
@@ -48,6 +57,8 @@ const Chat: React.FC = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
+  const [notificationTyping, setNotificationTyping] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
   const verifyLastDateMessage = useCallback((message_date: string) => {
     const result = intervalToDuration({
@@ -144,12 +155,39 @@ const Chat: React.FC = () => {
   const handleMessagesListener = useCallback((data: IMessageData) => {
     setMessages((old) => [data, ...old]);
   }, []);
+  const handleStopTyping = useCallback(() => {
+    socket.emit('typing', {
+      message: '',
+      token: id,
+      email: user.email,
+    });
+  }, [id, user.email]);
+
+  const handleTyping = useCallback(() => {
+    clearTimeout(timeoutId);
+    socket.emit('typing', {
+      message: `${user.name} está digitando...`,
+      token: id,
+      email: user.email,
+    });
+    timeoutId = setTimeout(() => handleStopTyping(), 3000);
+  }, [handleStopTyping, id, user.email, user.name]);
+
+  const handleTypingResponse = useCallback(
+    (data: ITyping) => {
+      setIsTyping(data.email !== user.email);
+      setNotificationTyping(data.message);
+    },
+    [user.email],
+  );
 
   useEffect(() => {
     socket.on('message', handleMessagesListener);
+    socket.on('typingResponse', handleTypingResponse);
 
     return () => {
       socket.off('message', handleMessagesListener);
+      socket.off('typingResponse', handleTypingResponse);
     };
   }, []);
 
@@ -182,6 +220,9 @@ const Chat: React.FC = () => {
         {chatMetadata.name}
       </ChatHeader>
       <MessagesArea ref={messagesAreaRef}>
+        {isTyping && (
+          <NotificationTypingArea>{notificationTyping}</NotificationTypingArea>
+        )}
         {messages.map((item, index) => (
           <>
             <MessageCard key={item.id} isSelfMessage={item.id_user === user.id}>
@@ -200,6 +241,7 @@ const Chat: React.FC = () => {
           rows={4}
           placeholder="Digite alguma coisa"
           name="message"
+          onKeyDown={() => handleTyping()}
         />
         <button type="submit">Enviar</button>
       </SendMessageArea>

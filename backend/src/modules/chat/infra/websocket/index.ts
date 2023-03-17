@@ -16,6 +16,16 @@ interface IMessageRequest {
   token: string;
 }
 
+interface ILastMessage {
+  text: string;
+  created_at: string;
+}
+
+interface ITyping {
+  message: string;
+  token: string;
+  email: string;
+}
 interface RoomUser {
   socket_id: string;
   user: User;
@@ -59,6 +69,15 @@ io.on('connection', (socket) => {
       });
 
       io.to(chat_token).emit('message', message);
+      io.to(chat_token).emit('chatTyping', message);
     },
   );
+
+  socket.on('typing', (data: ITyping) => {
+    io.to(data.token).emit('typingResponse', data);
+    io.to(data.token).emit('chatTyping', {
+      text: data.message,
+      created_at: new Date().toISOString(),
+    });
+  });
 });

@@ -56,8 +56,9 @@ const ListChats: React.FC = () => {
         return {
           profile_photo: chat_user.url_profile_photo,
           name_chat: chat_user.name,
-          last_message: item.chat.messages[0]?.text,
-          last_message_date: item.chat.messages[0]?.created_at,
+          last_message: item.chat.messages[item.chat.messages.length - 1]?.text,
+          last_message_date:
+            item.chat.messages[item.chat.messages.length - 1]?.created_at,
           chat_id: item.chat.token,
         };
       }),
