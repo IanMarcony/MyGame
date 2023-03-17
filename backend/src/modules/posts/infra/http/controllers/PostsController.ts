@@ -35,6 +35,7 @@ export default class PostsController {
 
   public async update(req: Request, res: Response): Promise<Response> {
     const { id_post, description, is_private } = req.body;
+
     const updatePost = container.resolve(UpdatePostService);
 
     const post = await updatePost.execute({

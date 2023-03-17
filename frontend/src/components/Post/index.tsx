@@ -2,9 +2,10 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable jsx-a11y/media-has-caption */
 /* eslint-disable react/no-array-index-key */
-import { Avatar } from '@mui/material';
+import { Avatar, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import React, { useCallback, useRef, useState } from 'react';
 import {
+  AiFillCloseCircle,
   AiFillLike,
   AiOutlineDelete,
   AiOutlineEdit,
@@ -12,11 +13,12 @@ import {
 } from 'react-icons/ai';
 import { BsSend } from 'react-icons/bs';
 import { FaComment } from 'react-icons/fa';
-import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
+import { FiArrowLeft, FiArrowRight, FiLock } from 'react-icons/fi';
+import { MdPublic } from 'react-icons/md';
+import Modal from 'react-modal';
 import UserIcon from '../../assets/user.png';
 import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';
-import AlterPost from '../AlterPost';
 import TextAreaInput from '../TextAreaInput';
 import {
   ActionsButtonArea,
@@ -29,7 +31,10 @@ import {
   CommentItem,
   CommentsArea,
   Container,
+  ContainerModalUpdate,
+  ContentUpdate,
   HeaderPost,
+  HeaderUpdate,
   InfoPost,
   ItemCarrousel,
   UserInfoArea,
@@ -82,6 +87,7 @@ const Posts: React.FC<PostProps> = ({ value }) => {
 
   const { token, user } = useAuth();
   const [isOpenEditPostModal, setIsOpenEditPostModal] = useState(false);
+  const [isPostPublic, setViewPost] = useState(value.is_private ? 0 : 1);
 
   const toggleOpenEditPostModal = useCallback(() => {
     setIsOpenEditPostModal(!isOpenEditPostModal);
@@ -220,6 +226,36 @@ const Posts: React.FC<PostProps> = ({ value }) => {
     });
     setDescriptionPost(postReload.description);
   }, [token, value.id]);
+
+  const handleSubmit = useCallback(
+    async (data: any) => {
+      try {
+        const is_private = isPostPublic === 0;
+
+        await api.put(
+          '/posts',
+          {
+            description: data.text_post,
+            is_private,
+            id_post: value.id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        toggleOpenEditPostModal();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [isPostPublic, token, toggleOpenEditPostModal],
+  );
+
+  const handleChangeViewPost = useCallback((event: SelectChangeEvent) => {
+    setViewPost(parseInt(event.target.value, 10));
+  }, []);
 
   return (
     <>
@@ -362,11 +398,10 @@ const Posts: React.FC<PostProps> = ({ value }) => {
             </AddCommentArea>
           )}
 
-          <AlterPost
+          <Modal
             isOpen={isOpenEditPostModal}
             onRequestClose={toggleOpenEditPostModal}
             onAfterClose={handleReloadPost}
-            toggleOpenEditPostModal={toggleOpenEditPostModal}
             style={{
               content: {
                 height: 'max-content',
@@ -375,13 +410,46 @@ const Posts: React.FC<PostProps> = ({ value }) => {
                 border: '2px solid var(--text-color)',
                 margin: '4% auto 0 auto',
                 width: '80%',
+                backgroundColor: 'var(--background-color)',
               },
               overlay: {
                 backgroundColor: '#342e2ed3',
               },
             }}
-            value={value}
-          />
+          >
+            <ContainerModalUpdate>
+              <HeaderUpdate>
+                <h1>Editar publicação</h1>
+                <button type="button" onClick={() => toggleOpenEditPostModal()}>
+                  <AiFillCloseCircle />
+                </button>
+              </HeaderUpdate>
+              <ContentUpdate onSubmit={handleSubmit}>
+                <Select
+                  value={isPostPublic.toString()}
+                  onChange={handleChangeViewPost}
+                >
+                  <MenuItem value={1}>
+                    <MdPublic />
+                    Público
+                  </MenuItem>
+                  <MenuItem value={0}>
+                    <FiLock />
+                    Somente Amigos
+                  </MenuItem>
+                </Select>
+
+                <TextAreaInput
+                  rows={4}
+                  placeholder="Poste alguma coisa..."
+                  name="text_post"
+                  defaultValue={value.description}
+                />
+
+                <button type="submit">Salvar</button>
+              </ContentUpdate>
+            </ContainerModalUpdate>
+          </Modal>
         </Container>
       )}
     </>
