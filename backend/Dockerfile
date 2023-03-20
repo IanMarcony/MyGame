@@ -6,4 +6,4 @@ COPY .  .
 
 RUN npm install
 RUN npm build
-RUN npm build:fix
+RUN npm run build:fix
