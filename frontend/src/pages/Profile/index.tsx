@@ -251,7 +251,7 @@ const Profile: React.FC = () => {
     setUserId(userData.id);
 
     setNameUser(userData.name);
-    setBirthDateUser(format(parseISO(userData.birth_date), 'dd-MM-yyyy'));
+    setBirthDateUser(userData.birth_date);
 
     if (userData.description) {
       setDescriptionUser(userData.description);
