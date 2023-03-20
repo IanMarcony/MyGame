@@ -29,7 +29,7 @@ export default class AccountGameUser {
   @JoinColumn({ name: 'id_user' })
   user: User;
 
-  @OneToOne(() => AccountGame)
+  @ManyToOne(() => AccountGame)
   @JoinColumn({ name: 'id_account_game' })
   account_game: AccountGame;
 

@@ -29,8 +29,8 @@ export default class User {
   @Column({ type: 'text' })
   password: string;
 
-  @Column({ type: 'datetime' })
-  birth_date: Date;
+  @Column({ type: 'text' })
+  birth_date: string;
 
   @Column({ type: 'text', nullable: true })
   url_profile_photo: string;
