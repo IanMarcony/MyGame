@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "build:fix": "tsc-alias",
+    "post:build": "tsc-alias",
     "dev": "ts-node-dev -r tsconfig-paths/register --inspect --transpile-only --ignore-watch node_modules src/shared/infra/http/server.ts",
     "start": "node ./dist/shared/infra/http/server.js",
     "migration:create": "node -r tsconfig-paths/register ./node_modules/typeorm/cli-ts-node-commonjs.js migration:create ./src/shared/infra/typeorm/database/migrations/network",
@@ -39,6 +39,7 @@
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
     "tsc-alias": "^1.8.3",
+    "tsc-silent": "^1.2.2",
     "tsconfig-paths": "^4.1.2",
     "tscpaths": "^0.0.9",
     "typescript": "^4.4.2"
