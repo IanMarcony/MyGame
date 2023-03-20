@@ -9,8 +9,9 @@ services:
     depends_on:
       - mygame_db
     build:
-      dockerfile: Dockerfile.build
+      dockerfile: Dockerfile
       context: ./backend
+    command: npm build && npm run build:fix && npm start
     environment:
       - MYSQL_DATABASE=mygame_db
       - MYSQL_ROOT_PASSWORD=mygameroot
