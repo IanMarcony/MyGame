@@ -13,11 +13,7 @@ import { Server } from 'socket.io';
 import '@shared/container';
 
 const app = express();
-app.use(
-  cors({
-    origin: 'http://154.53.35.101:8080',
-  }),
-);
+app.use(cors());
 app.use(express.json());
 
 app.use('/files', express.static(uploadConfig.uploadsFolder));
