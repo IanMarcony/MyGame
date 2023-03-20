@@ -7,7 +7,7 @@
     "build": "tsc",
     "build:fix": "tsc-alias",
     "dev": "ts-node-dev -r tsconfig-paths/register --inspect --transpile-only --ignore-watch node_modules src/shared/infra/http/server.ts",
-    "start": "node dist/shared/infra/http/server.js",
+    "start": "node ./dist/shared/infra/http/server.js",
     "migration:create": "node -r tsconfig-paths/register ./node_modules/typeorm/cli-ts-node-commonjs.js migration:create ./src/shared/infra/typeorm/database/migrations/network",
     "migration:generate": "node -r tsconfig-paths/register ./node_modules/typeorm/cli-ts-node-commonjs.js -d ./src/data-source.ts migration:generate ./src/shared/infra/typeorm/database/migrations/network",
     "migration:run": "node -r tsconfig-paths/register ./node_modules/typeorm/cli-ts-node-commonjs.js  -d ./src/data-source.ts migration:run"
