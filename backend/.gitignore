@@ -8,5 +8,5 @@ tmp/uploads/*
 !tmp/uploads/
 !tmp/uploads/.gitkeep
 .env
-
+dist/
 *.lock
