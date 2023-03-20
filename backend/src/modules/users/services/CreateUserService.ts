@@ -68,7 +68,7 @@ export default class CreateUserService {
       name,
       email,
       password: hashedPassword,
-      birth_date: new Date(birth_date).toISOString(),
+      birth_date,
       description,
     });
 
