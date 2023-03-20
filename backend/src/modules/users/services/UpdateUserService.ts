@@ -5,7 +5,7 @@ import { inject, injectable } from 'tsyringe';
 
 interface IRequest {
   name: string;
-  birth_date: Date;
+  birth_date: string;
   description: string;
   id_user: number;
 }
