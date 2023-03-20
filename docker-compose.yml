@@ -16,7 +16,7 @@ services:
       - MYSQL_DATABASE=mygame_db
       - MYSQL_ROOT_PASSWORD=mygameroot
       - MYSQL_USER=root
-      - MYSQL_LOCALHOST=localhost
+      - MYSQL_LOCALHOST=mygame_db
       - MYSQL_PORT=3306
       - API_PORT=3333
       - CLIENT_URL=http://154.53.35.101:8080
@@ -38,7 +38,7 @@ services:
       - MYSQL_DATABASE=mygame_db
       - MYSQL_ROOT_PASSWORD=mygameroot
       - MYSQL_USER=root
-      - MYSQL_LOCALHOST=localhost
+      - MYSQL_LOCALHOST=mygame_db
       - MYSQL_PORT=3306
       - API_PORT=3333
       - CLIENT_URL=http://154.53.35.101:8080
