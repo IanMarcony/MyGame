@@ -5,8 +5,9 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
+    "build:fix": "tsc-alias",
     "dev": "ts-node-dev -r tsconfig-paths/register --inspect --transpile-only --ignore-watch node_modules src/shared/infra/http/server.ts",
-    "start": "ts-node src/shared/infra/http/server.ts",
+    "start": "node dist/shared/infra/http/server.js",
     "migration:create": "node -r tsconfig-paths/register ./node_modules/typeorm/cli-ts-node-commonjs.js migration:create ./src/shared/infra/typeorm/database/migrations/network",
     "migration:generate": "node -r tsconfig-paths/register ./node_modules/typeorm/cli-ts-node-commonjs.js -d ./src/data-source.ts migration:generate ./src/shared/infra/typeorm/database/migrations/network",
     "migration:run": "node -r tsconfig-paths/register ./node_modules/typeorm/cli-ts-node-commonjs.js  -d ./src/data-source.ts migration:run"
@@ -34,8 +35,12 @@
     "husky": "^8.0.2",
     "lint-staged": "^13.1.0",
     "prettier": "^2.8.1",
+    "ts-alias": "^0.0.7",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
+    "tsc-alias": "^1.8.3",
+    "tsconfig-paths": "^4.1.2",
+    "tscpaths": "^0.0.9",
     "typescript": "^4.4.2"
   },
   "dependencies": {
