@@ -7,7 +7,8 @@ import React, {
   TextareaHTMLAttributes,
 } from 'react';
 import { useField } from '@unform/core';
-import { Container } from './styles';
+import { FiAlertCircle } from 'react-icons/fi';
+import { Container, Error } from './styles';
 
 interface InputProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   name: string;
@@ -43,6 +44,11 @@ const TextAreaInput: React.FC<InputProps> = ({ name, ...rest }: InputProps) => {
         ref={inputRef}
         {...rest}
       />
+      {error && (
+        <Error title={error}>
+          <FiAlertCircle size={20} color="#c53030" />
+        </Error>
+      )}
     </Container>
   );
 };

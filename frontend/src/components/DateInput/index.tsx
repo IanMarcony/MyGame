@@ -12,7 +12,8 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { useField } from '@unform/core';
-import { Container } from './styles';
+import { FiAlertCircle } from 'react-icons/fi';
+import { Container, Error } from './styles';
 
 interface InputProps {
   name: string;
@@ -57,11 +58,19 @@ const DateInput: React.FC<InputProps> = ({ name, value: valueDate }) => {
           onChange={(newValue) => setValue(newValue)}
           inputRef={inputRef}
           renderInput={(params) => (
-            <TextField
-              onFocus={handleInputFocus}
-              onBlur={handleInputBlur}
-              {...params}
-            />
+            <>
+              <TextField
+                onFocus={handleInputFocus}
+                onBlur={handleInputBlur}
+                defaultValue={defaultValue}
+                {...params}
+              />
+              {error && (
+                <Error title={error}>
+                  <FiAlertCircle size={20} color="#c53030" />
+                </Error>
+              )}
+            </>
           )}
         />
       </LocalizationProvider>

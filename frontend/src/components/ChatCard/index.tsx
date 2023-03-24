@@ -30,8 +30,6 @@ interface ChatCardProps {
   content: IContentChat;
 }
 
-const timoutId: any = 0;
-
 const ChatCard: React.FC<ChatCardProps> = ({ content }) => {
   const [lastMessage, setLastMessage] = useState(content.last_message);
   const [lastMessageAux, setLastMessageAux] = useState(content.last_message);
@@ -99,7 +97,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ content }) => {
     return () => {
       socket.off('chatTyping', handleTypingResponse);
     };
-  }, []);
+  });
 
   return (
     <Container to={`/dashboard/chat/${content.chat_id}`}>

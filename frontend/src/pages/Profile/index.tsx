@@ -17,7 +17,7 @@ import { FiBookOpen, FiUser } from 'react-icons/fi';
 import { BsUpload } from 'react-icons/bs';
 import { AiFillCloseCircle } from 'react-icons/ai';
 import * as Yup from 'yup';
-import { format, parseISO, sub } from 'date-fns';
+import { sub } from 'date-fns';
 
 import BannerIcon from '../../assets/banner.jpg';
 import UserIcon from '../../assets/user.png';

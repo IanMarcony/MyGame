@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Waypoint } from 'react-waypoint';
-import { v4 as uuid } from 'uuid';
 import Posts from '../../components/Post';
 import PublishArea from '../../components/PublishArea';
 import { useAuth } from '../../hooks/auth';
