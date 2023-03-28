@@ -581,8 +581,6 @@ const Profile: React.FC = () => {
         toggleOpenPreferencesInfoModal();
       } catch (err) {
         toggleLoading();
-
-        console.error(err);
       }
     },
     [
