@@ -1,4 +1,4 @@
-import { Avatar } from '@mui/material';
+import { Avatar, LinearProgress } from '@mui/material';
 import React from 'react';
 import { FiBell, FiHome, FiLogOut, FiMessageCircle } from 'react-icons/fi';
 import { Link, Outlet } from 'react-router-dom';
@@ -12,12 +12,15 @@ import {
   ContentButtonContainer,
   UserButtonsContainer,
 } from './styles';
+import { useProgressLoading } from '../../hooks/progress';
 
 const Layout: React.FC = () => {
   const { user, signOut } = useAuth();
+  const { loading } = useProgressLoading();
 
   return (
     <>
+      {loading && <LinearProgress />}
       <NavHeader>
         <SearchInput />
 

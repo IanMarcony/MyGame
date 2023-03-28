@@ -10,6 +10,8 @@ import { MdPublic, MdRemoveCircle } from 'react-icons/md';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuth } from '../../hooks/auth';
 import { usePostsHome } from '../../hooks/posts.home';
+import { useProgressLoading } from '../../hooks/progress';
+import { useToast } from '../../hooks/toast';
 import api from '../../services/api';
 import TextAreaInput from '../TextAreaInput';
 
@@ -34,6 +36,8 @@ const PublishArea: React.FC = () => {
   const [isHiddenForm, setIsHiddenForm] = useState(true);
 
   const { token, user } = useAuth();
+  const { addToast } = useToast();
+  const { toggleLoading } = useProgressLoading();
   const toggleOpenForm = useCallback(() => {
     setIsHiddenForm(!isHiddenForm);
   }, [isHiddenForm]);
@@ -43,13 +47,14 @@ const PublishArea: React.FC = () => {
   const handleSubmit = useCallback(
     async (data: any) => {
       try {
+        toggleLoading();
         const formData = new FormData();
         const is_private = isPostPublic === 0;
 
         formData.append('description', data.text_post);
         formData.append('is_private', `${is_private}`);
 
-        for (const fileUpload of files) {
+        for (const fileUpload of files.reverse()) {
           formData.append(uuidv4(), fileUpload);
         }
 
@@ -66,13 +71,32 @@ const PublishArea: React.FC = () => {
         };
 
         addNewPosts(newPost);
+        setFiles([]);
+        setPreviewUrlFiles([]);
+        setViewPost(1);
+        toggleLoading();
 
         toggleOpenForm();
       } catch (error) {
-        console.log(error);
+        toggleLoading();
+
+        addToast({
+          title: 'Error',
+          description: 'Erro ao postar',
+          type: 'error',
+        });
       }
     },
-    [isPostPublic, token, user, addNewPosts, toggleOpenForm, files],
+    [
+      isPostPublic,
+      token,
+      user,
+      addNewPosts,
+      toggleOpenForm,
+      files,
+      addToast,
+      toggleLoading,
+    ],
   );
 
   const handleFiles = useCallback(
@@ -102,12 +126,22 @@ const PublishArea: React.FC = () => {
       const filesUploaded = [];
 
       for (let i = 0; i < event.dataTransfer.files.length; i++) {
+        if (
+          event.dataTransfer.files[i].type.includes('video') ||
+          event.dataTransfer.files[i].type.includes('image')
+        ) {
+          addToast({
+            title: 'Error',
+            description: 'Somente envie vídeo ou imagens',
+            type: 'error',
+          });
+        }
         filesUploaded.push(event.dataTransfer.files[i]);
       }
 
       handleFiles(filesUploaded);
     },
-    [handleFiles],
+    [handleFiles, addToast],
   );
 
   const handleFormatOnChangeInput = useCallback(

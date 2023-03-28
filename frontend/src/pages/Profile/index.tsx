@@ -17,7 +17,7 @@ import { FiBookOpen, FiUser } from 'react-icons/fi';
 import { BsUpload } from 'react-icons/bs';
 import { AiFillCloseCircle } from 'react-icons/ai';
 import * as Yup from 'yup';
-import { format, parseISO, sub } from 'date-fns';
+import { sub } from 'date-fns';
 
 import BannerIcon from '../../assets/banner.jpg';
 import UserIcon from '../../assets/user.png';
@@ -55,6 +55,8 @@ import {
 import Input from '../../components/Input';
 import DateInput from '../../components/DateInput';
 import AccountInput from '../../components/AccountInput';
+import { useProgressLoading } from '../../hooks/progress';
+import { useToast } from '../../hooks/toast';
 
 interface IPreferences {
   id: number;
@@ -164,6 +166,9 @@ const Profile: React.FC = () => {
   const [categoriesGameSelected, setCategoriesGameSelected] = useState<
     string[]
   >([]);
+  const { toggleLoading } = useProgressLoading();
+  const { addToast } = useToast();
+
   const navigate = useNavigate();
 
   const getStyles = useCallback((name: string, arr: readonly string[]) => {
@@ -195,6 +200,7 @@ const Profile: React.FC = () => {
         return;
       }
       setLoading(true);
+      toggleLoading();
 
       const { data } = await api.get(`/posts/${page}`, {
         params: { page, id_user },
@@ -207,9 +213,11 @@ const Profile: React.FC = () => {
 
       setPostsUser([...postsUser, ...newPosts]);
       setTotal(count);
+      toggleLoading();
+
       setLoading(false);
     },
-    [loading, total, postsUser, page, token],
+    [loading, total, postsUser, page, token, toggleLoading],
   );
 
   const handleInfiniteScroll = useCallback(() => {
@@ -224,6 +232,8 @@ const Profile: React.FC = () => {
   }, [loading, page, postsUser.length, total]);
 
   const handleGetUserProfile = useCallback(async () => {
+    toggleLoading();
+
     const { data: userData } = await api.get(`/users/${email}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -318,9 +328,12 @@ const Profile: React.FC = () => {
 
     setTotal(count);
     setLoading(false);
-  }, [email, token, user.email]);
+    toggleLoading();
+  }, [email, token, user.email, toggleLoading]);
 
   const handleAddFriend = useCallback(async () => {
+    toggleLoading();
+
     const { data } = await api.post(
       '/friends/request',
       { email_friend: email },
@@ -332,9 +345,12 @@ const Profile: React.FC = () => {
     );
     setRequestIdFriend(data.id_request);
     setTypeButtonShow(2);
-  }, [email, token]);
+    toggleLoading();
+  }, [email, token, toggleLoading]);
 
   const handleCancelFriendRequest = useCallback(async () => {
+    toggleLoading();
+
     await api.delete(`/friends/request`, {
       params: { id_request: requestIdFriend },
       headers: {
@@ -342,9 +358,12 @@ const Profile: React.FC = () => {
       },
     });
     setTypeButtonShow(1);
-  }, [requestIdFriend, token]);
+    toggleLoading();
+  }, [requestIdFriend, token, toggleLoading]);
 
   const handleDeleteFriend = useCallback(async () => {
+    toggleLoading();
+
     await api.delete(`/friends/remove`, {
       params: { id_friend: userId },
       headers: {
@@ -352,9 +371,12 @@ const Profile: React.FC = () => {
       },
     });
     setTypeButtonShow(1);
-  }, [token, userId]);
+    toggleLoading();
+  }, [token, userId, toggleLoading]);
 
   const handleImagesSubmit = useCallback(async () => {
+    toggleLoading();
+
     const config = {
       headers: {
         authorization: `Bearer ${token}`,
@@ -391,11 +413,14 @@ const Profile: React.FC = () => {
     }
 
     updateUser(userData);
-  }, [imageBanner, imageProfile, token, updateUser]);
+    toggleLoading();
+  }, [imageBanner, imageProfile, token, updateUser, toggleLoading]);
 
   const handleBasicInfoSubmit = useCallback(
     async (data: IRequestBasicInfoSubmit) => {
       try {
+        toggleLoading();
+
         const schema = Yup.object().shape({
           name: Yup.string().required('Nome obrigatório'),
           birth_date: Yup.string().required('Data de nascimento obrigatória'),
@@ -431,13 +456,28 @@ const Profile: React.FC = () => {
 
         setNameUser(data.name);
         setDescriptionUser(data.description);
+        toggleLoading();
+
+        addToast({
+          type: 'success',
+          title: 'Sucesso!',
+          description: 'Informações atualizadas',
+        });
 
         toggleOpenBasicInfoModal();
       } catch (e) {
-        console.log(`Error: ${e}`);
+        toggleLoading();
+
+        addToast({
+          type: 'error',
+          title: 'Error',
+          description: 'Erro ao atualizar informações',
+        });
       }
     },
     [
+      addToast,
+      toggleLoading,
       handleImagesSubmit,
       imageBanner,
       imageProfile,
@@ -449,8 +489,17 @@ const Profile: React.FC = () => {
 
   const handlePreferencesInfoSubmit = useCallback(
     async (data: any) => {
+      toggleLoading();
+
       if (categoriesGameSelected.length < 1) {
-        alert('Selecione pelo menos uma preferência');
+        addToast({
+          title: 'Erro',
+          description: 'Selecione pelo menos uma preferência',
+          type: 'error',
+        });
+
+        toggleLoading();
+
         return;
       }
       try {
@@ -527,13 +576,17 @@ const Profile: React.FC = () => {
             },
           ),
         );
+        toggleLoading();
+
         toggleOpenPreferencesInfoModal();
       } catch (err) {
-        console.error(err);
+        toggleLoading();
       }
     },
     [
+      toggleLoading,
       categoriesGameSelected,
+      addToast,
       token,
       toggleOpenPreferencesInfoModal,
       accountGames,
@@ -609,16 +662,21 @@ const Profile: React.FC = () => {
   );
 
   const handleLoadPreferences = useCallback(async () => {
+    toggleLoading();
+
     const [categoriesResponse, accountsResponse] = await Promise.all([
       await api.get('/categoriesgame'),
       await api.get('/accountgames'),
     ]);
     setCategoriesGame(categoriesResponse.data);
     setAccountGames(accountsResponse.data);
-  }, []);
+    toggleLoading();
+  }, [toggleLoading]);
 
   const handleSendMessage = useCallback(async () => {
     try {
+      toggleLoading();
+
       const { data: chatResponse } = await api.post(
         '/chats',
         {
@@ -630,12 +688,19 @@ const Profile: React.FC = () => {
           },
         },
       );
+      toggleLoading();
 
       navigate(`/dashboard/chat/${chatResponse.chat.token}`);
     } catch (error) {
-      console.log(error);
+      toggleLoading();
+
+      addToast({
+        type: 'error',
+        title: 'Error',
+        description: 'Erro ao enviar mensagem',
+      });
     }
-  }, [navigate, token, userId]);
+  }, [navigate, token, userId, toggleLoading, addToast]);
 
   useEffect(() => {
     setPostsUser([]);

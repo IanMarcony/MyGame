@@ -2,6 +2,8 @@ import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { format, intervalToDuration, parseISO } from 'date-fns';
 import { Waypoint } from 'react-waypoint';
+import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
 import TextAreaInput from '../../components/TextAreaInput';
 import { useAuth } from '../../hooks/auth';
 
@@ -18,6 +20,7 @@ import {
 import UserIcon from '../../assets/user.png';
 import api from '../../services/api';
 import socket from '../../services/socket';
+import getValidationErrors from '../../utils/getValidationErrors';
 
 interface IMessageData {
   id: number;
@@ -46,6 +49,7 @@ interface ISubmitData {
 let timeoutId: any = 0;
 
 const Chat: React.FC = () => {
+  const formRef = useRef<FormHandles>(null);
   const { id } = useParams();
   const { user, token } = useAuth();
   const [chatMetadata, setChatMetadata] = useState<IChatMetadata>(
@@ -109,16 +113,27 @@ const Chat: React.FC = () => {
 
   const handleSubmit = useCallback(
     async (data: ISubmitData) => {
-      if (data.message.trim().length === 0) {
-        return;
-      }
+      try {
+        formRef.current?.setErrors({});
 
-      socket.emit('message', {
-        text: data.message,
-        id_chat: chatMetadata.id_chat,
-        chat_token: id,
-        token: `Bearer ${token}`,
-      });
+        const schema = Yup.object().shape({
+          message: Yup.string().required('Digite algo'),
+        });
+
+        await schema.validate(data, { abortEarly: false });
+
+        socket.emit('message', {
+          text: data.message,
+          id_chat: chatMetadata.id_chat,
+          chat_token: id,
+          token: `Bearer ${token}`,
+        });
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
+          formRef.current?.setErrors(errors);
+        }
+      }
     },
     [chatMetadata.id_chat, token, id],
   );
@@ -189,7 +204,7 @@ const Chat: React.FC = () => {
       socket.off('message', handleMessagesListener);
       socket.off('typingResponse', handleTypingResponse);
     };
-  }, []);
+  });
 
   useEffect(() => {
     messagesAreaRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -236,7 +251,7 @@ const Chat: React.FC = () => {
           </>
         ))}
       </MessagesArea>
-      <SendMessageArea onSubmit={handleSubmit}>
+      <SendMessageArea ref={formRef} onSubmit={handleSubmit}>
         <TextAreaInput
           rows={4}
           placeholder="Digite alguma coisa"
