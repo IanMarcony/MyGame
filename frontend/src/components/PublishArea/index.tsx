@@ -57,6 +57,8 @@ const PublishArea: React.FC = () => {
             description: 'Não pode post vazio',
             type: 'error',
           });
+          toggleLoading();
+
           return;
         }
 
