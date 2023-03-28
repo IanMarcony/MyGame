@@ -10,6 +10,8 @@ import { useAuth } from '../../hooks/auth';
 
 import { Container, FormSignin, SectionSignin } from './styles';
 import getValidationErrors from '../../utils/getValidationErrors';
+import { useToast } from '../../hooks/toast';
+import { useProgressLoading } from '../../hooks/progress';
 
 interface ILoginState {
   email: string;
@@ -18,13 +20,16 @@ interface ILoginState {
 
 const SignIn: React.FC = () => {
   const { signIn, user } = useAuth();
+  const { addToast } = useToast();
   const nagivate = useNavigate();
   const formRef = useRef<FormHandles>(null);
+  const { toggleLoading } = useProgressLoading();
 
   const handleSignIn = useCallback(
     async (data: ILoginState) => {
       try {
         formRef.current?.setErrors({});
+        toggleLoading();
 
         const schema = Yup.object().shape({
           email: Yup.string()
@@ -39,17 +44,24 @@ const SignIn: React.FC = () => {
         await schema.validate(data, { abortEarly: false });
 
         await signIn({ email: data.email, password: data.password });
+        toggleLoading();
         return nagivate('/dashboard');
       } catch (err) {
+        toggleLoading();
+
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
           formRef.current?.setErrors(errors);
           return;
         }
-        return alert(`Erro ao processar dados ->${err}`);
+        addToast({
+          title: 'Error',
+          description: 'Algo ocorreu ao entrar na sua conta',
+          type: 'error',
+        });
       }
     },
-    [signIn, nagivate],
+    [toggleLoading, signIn, nagivate, addToast],
   );
 
   return (

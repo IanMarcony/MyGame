@@ -20,6 +20,8 @@ import Modal from 'react-modal';
 import * as Yup from 'yup';
 import UserIcon from '../../assets/user.png';
 import { useAuth } from '../../hooks/auth';
+import { useProgressLoading } from '../../hooks/progress';
+import { useToast } from '../../hooks/toast';
 import api from '../../services/api';
 import getValidationErrors from '../../utils/getValidationErrors';
 import TextAreaInput from '../TextAreaInput';
@@ -93,6 +95,8 @@ const Posts: React.FC<PostProps> = ({ value }) => {
   const formRef = useRef<FormHandles>(null);
 
   const { token, user } = useAuth();
+  const { addToast } = useToast();
+  const { toggleLoading } = useProgressLoading();
   const [isOpenEditPostModal, setIsOpenEditPostModal] = useState(false);
   const [isPostPublic, setViewPost] = useState(value.is_private ? 0 : 1);
 
@@ -122,6 +126,7 @@ const Posts: React.FC<PostProps> = ({ value }) => {
   }, []);
 
   const handleLikePost = useCallback(async () => {
+    toggleLoading();
     await api.put(
       '/posts/likes',
       {
@@ -135,9 +140,11 @@ const Posts: React.FC<PostProps> = ({ value }) => {
     );
 
     const like = !isLiked;
+    toggleLoading();
+
     setLiked(like);
     like ? setCountLikes(countLikes + 1) : setCountLikes(countLikes - 1);
-  }, [value.id, token, isLiked, countLikes]);
+  }, [value.id, token, isLiked, countLikes, toggleLoading]);
 
   const handleToggleAddCommentArea = useCallback(() => {
     setIsHiddenAddComment(!isHiddenAddComment);
@@ -146,6 +153,8 @@ const Posts: React.FC<PostProps> = ({ value }) => {
   const handleSubmitComment = useCallback(
     async (data: ISubmitCommentData) => {
       try {
+        toggleLoading();
+
         formRef.current?.setErrors({});
 
         const schema = Yup.object().shape({
@@ -176,20 +185,30 @@ const Posts: React.FC<PostProps> = ({ value }) => {
           },
           ...comments,
         ]);
+        toggleLoading();
         setCountComments(countComments + 1);
 
         handleToggleAddCommentArea();
       } catch (err) {
+        toggleLoading();
+
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
           formRef.current?.setErrors(errors);
         }
+        addToast({
+          title: 'Erro',
+          description: 'Ocorreu algum erro ao comentar',
+          type: 'error',
+        });
       }
     },
     [
+      addToast,
       comments,
       countComments,
       handleToggleAddCommentArea,
+      toggleLoading,
       token,
       user,
       value.id,
@@ -198,6 +217,8 @@ const Posts: React.FC<PostProps> = ({ value }) => {
 
   const handleDeleteComment = useCallback(
     async (id_comment: number) => {
+      toggleLoading();
+
       await api.delete(
         `/posts/comments?id_comment=${id_comment}&id_post=${value.id}`,
 
@@ -210,13 +231,16 @@ const Posts: React.FC<PostProps> = ({ value }) => {
 
       setComments(comments.filter((item) => item.id !== id_comment));
       setCountComments(countComments - 1);
+      toggleLoading();
     },
-    [comments, countComments, token, value.id],
+    [comments, countComments, toggleLoading, token, value.id],
   );
 
   const handleDeletePost = useCallback(
     async (id_post: number) => {
       try {
+        toggleLoading();
+
         await api.delete(`/posts`, {
           params: { id_post },
           headers: {
@@ -224,11 +248,17 @@ const Posts: React.FC<PostProps> = ({ value }) => {
           },
         });
         setHiddenPost(true);
+        toggleLoading();
       } catch (error) {
-        console.error(error);
+        toggleLoading();
+        addToast({
+          title: 'Erro',
+          description: 'Ocorreu algum erro ao excluir post',
+          type: 'error',
+        });
       }
     },
-    [token],
+    [addToast, toggleLoading, token],
   );
 
   const handleReloadPost = useCallback(async () => {
@@ -246,6 +276,8 @@ const Posts: React.FC<PostProps> = ({ value }) => {
   const handleSubmit = useCallback(
     async (data: any) => {
       try {
+        toggleLoading();
+
         const is_private = isPostPublic === 0;
 
         await api.put(
@@ -262,11 +294,12 @@ const Posts: React.FC<PostProps> = ({ value }) => {
           },
         );
         toggleOpenEditPostModal();
+        toggleLoading();
       } catch (error) {
-        console.log(error);
+        toggleLoading();
       }
     },
-    [isPostPublic, value.id, token, toggleOpenEditPostModal],
+    [toggleLoading, isPostPublic, value.id, token, toggleOpenEditPostModal],
   );
 
   const handleChangeViewPost = useCallback((event: SelectChangeEvent) => {
