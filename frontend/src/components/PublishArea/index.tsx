@@ -71,7 +71,9 @@ const PublishArea: React.FC = () => {
         };
 
         addNewPosts(newPost);
-
+        setFiles([]);
+        setPreviewUrlFiles([]);
+        setViewPost(1);
         toggleLoading();
 
         toggleOpenForm();
