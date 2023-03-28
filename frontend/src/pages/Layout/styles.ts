@@ -54,6 +54,7 @@ export const UserButtonsContainer = styled.div`
     display: block;
 
     transition: opacity 0.2s;
+    cursor: pointer;
 
     &:hover {
       opacity: 0.5;
