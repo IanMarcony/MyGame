@@ -51,6 +51,15 @@ const PublishArea: React.FC = () => {
         const formData = new FormData();
         const is_private = isPostPublic === 0;
 
+        if (data.text_post.trim().length === 0 && files.length === 0) {
+          addToast({
+            title: 'Error',
+            description: 'Não pode post vazio',
+            type: 'error',
+          });
+          return;
+        }
+
         formData.append('description', data.text_post);
         formData.append('is_private', `${is_private}`);
 
