@@ -3,6 +3,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-plusplus */
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { FormHandles } from '@unform/core';
 import React, { useState, useCallback, useRef } from 'react';
 import { BsUpload } from 'react-icons/bs';
 import { FiArrowLeft, FiArrowRight, FiLock } from 'react-icons/fi';
@@ -29,6 +30,7 @@ import {
 const PublishArea: React.FC = () => {
   const filesInput = useRef<HTMLInputElement>(null);
   const carrouselRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<FormHandles>(null);
 
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrlFiles, setPreviewUrlFiles] = useState<string[]>([]);
@@ -86,7 +88,7 @@ const PublishArea: React.FC = () => {
         setPreviewUrlFiles([]);
         setViewPost(1);
         toggleLoading();
-
+        formRef.current?.clearField('text_post');
         toggleOpenForm();
       } catch (error) {
         toggleLoading();
@@ -209,7 +211,7 @@ const PublishArea: React.FC = () => {
       </AddPostButton>
 
       {!isHiddenForm && (
-        <Content onSubmit={handleSubmit}>
+        <Content ref={formRef} onSubmit={handleSubmit}>
           {files.length > 0 && (
             <CarrouselFiles ref={carrouselRef} onWheel={(e) => handleWheel(e)}>
               {files.length > 1 ? (

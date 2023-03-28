@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { format, intervalToDuration, parseISO } from 'date-fns';
 import { Waypoint } from 'react-waypoint';
 import { FormHandles } from '@unform/core';
+import { v4 as uuid } from 'uuid';
 import * as Yup from 'yup';
 import TextAreaInput from '../../components/TextAreaInput';
 import { useAuth } from '../../hooks/auth';
@@ -128,6 +129,7 @@ const Chat: React.FC = () => {
           chat_token: id,
           token: `Bearer ${token}`,
         });
+        formRef.current?.clearField('message');
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
@@ -167,9 +169,13 @@ const Chat: React.FC = () => {
     }
   }, [id, token, user, navigate]);
 
-  const handleMessagesListener = useCallback((data: IMessageData) => {
-    setMessages((old) => [data, ...old]);
-  }, []);
+  const handleMessagesListener = useCallback(
+    (data: IMessageData) => {
+      setTotal((old) => old + 1);
+      setMessages([data, ...messages]);
+    },
+    [messages],
+  );
   const handleStopTyping = useCallback(() => {
     socket.emit('typing', {
       message: '',
@@ -199,7 +205,6 @@ const Chat: React.FC = () => {
   useEffect(() => {
     socket.on('message', handleMessagesListener);
     socket.on('typingResponse', handleTypingResponse);
-
     return () => {
       socket.off('message', handleMessagesListener);
       socket.off('typingResponse', handleTypingResponse);
@@ -246,7 +251,7 @@ const Chat: React.FC = () => {
             </MessageCard>
             {index === messages.length - messages.length * 0.5 && (
               // eslint-disable-next-line react/no-array-index-key
-              <Waypoint key={index} onEnter={() => verifyLoadMessages()} />
+              <Waypoint key={uuid()} onEnter={() => verifyLoadMessages()} />
             )}
           </>
         ))}
