@@ -20,6 +20,7 @@ import * as Yup from 'yup';
 import { sub } from 'date-fns';
 import { BsUpload } from 'react-icons/bs';
 import { Avatar } from '@mui/material';
+import { FormHandles } from '@unform/core';
 import Input from '../../components/Input';
 import {
   AccountsContainer,
@@ -41,6 +42,10 @@ import api from '../../services/api';
 import AccountInput from '../../components/AccountInput';
 import { useAuth } from '../../hooks/auth';
 import Constants from '../../utils/Constants';
+import getValidationErrors from '../../utils/getValidationErrors';
+import FormError from '../../exceptions/FormError';
+import { useToast } from '../../hooks/toast';
+import { useProgressLoading } from '../../hooks/progress';
 
 interface ICategoriesGame {
   id: number;
@@ -53,7 +58,17 @@ interface IAccountGame {
   company: string;
 }
 
+interface ISubmitData {
+  name: string;
+  birth_date: string;
+  email: string;
+  password: string;
+  repassword: string;
+  [key: string]: string;
+}
+
 const SignUp: React.FC = () => {
+  const formRef = useRef<FormHandles>(null);
   const [categoriesGame, setCategoriesGame] = useState<ICategoriesGame[]>([]);
   const [accountGames, setAccountGames] = useState<IAccountGame[]>([]);
   const [categoriesGameSelected, setCategoriesGameSelected] = useState<
@@ -70,6 +85,8 @@ const SignUp: React.FC = () => {
     return BannerIcon;
   });
   const { signIn, updateUser } = useAuth();
+  const { addToast } = useToast();
+  const { toggleLoading } = useProgressLoading();
   const nagivate = useNavigate();
 
   const handleRequestBase = useCallback(async () => {
@@ -105,46 +122,69 @@ const SignUp: React.FC = () => {
   );
 
   const handleImagesSubmit = useCallback(async () => {
-    const token = localStorage.getItem(Constants.storage.token);
-    const config = {
-      headers: {
-        authorization: `Bearer ${token}`,
-        'content-type': 'multipart/form-data',
-      },
-    };
+    try {
+      toggleLoading();
+      const token = localStorage.getItem(Constants.storage.token);
+      const config = {
+        headers: {
+          authorization: `Bearer ${token}`,
+          'content-type': 'multipart/form-data',
+        },
+      };
 
-    const formData = new FormData();
-    formData.append('profile_image', imageProfile || '');
-    formData.append('banner_image', imageBanner || '');
+      const formData = new FormData();
+      formData.append('profile_image', imageProfile || '');
+      formData.append('banner_image', imageBanner || '');
 
-    const { data: user } = await api.patch('/users/images', formData, config);
+      const { data: user } = await api.patch('/users/images', formData, config);
 
-    updateUser(user);
+      updateUser(user);
+      toggleLoading();
 
-    return nagivate('/dashboard');
-  }, [imageBanner, imageProfile, nagivate, updateUser]);
+      return nagivate('/dashboard');
+    } catch (error) {
+      toggleLoading();
+    }
+  }, [imageBanner, imageProfile, nagivate, updateUser, toggleLoading]);
 
   const handleSubmit = useCallback(
-    async (data: any) => {
+    async (data: ISubmitData) => {
       try {
+        formRef.current?.setErrors({});
+        toggleLoading();
         const schema = Yup.object().shape({
           name: Yup.string().required('Nome obrigatório'),
           birth_date: Yup.string().required('Data de nascimento obrigatória'),
           email: Yup.string()
             .required('E-mail obrigatório')
             .email('Digite um e-mail válido'),
-          password: Yup.string().required().min(8).max(16),
-          repassword: Yup.string().required().min(8).max(16),
+          password: Yup.string()
+            .required('Senha obrigatória entre 8 e 16 digitos')
+            .min(8, 'Senha obrigatória entre 8 e 16 digitos')
+            .max(16, 'Senha obrigatória entre 8 e 16 digitos'),
+          repassword: Yup.string()
+            .required('Senha obrigatória entre 8 e 16 digitos')
+            .min(8, 'Senha obrigatória entre 8 e 16 digitos')
+            .max(16, 'Senha obrigatória entre 8 e 16 digitos'),
         });
 
         await schema.validate(data, { abortEarly: false });
 
         if (data.password !== data.repassword) {
-          throw new Error('As senhas não são iguais');
+          throw new FormError({
+            repassword: 'As senhas não são iguais',
+            password: 'As senhas não são iguais',
+          });
         }
 
         if (categoriesGameSelected.length === 0) {
-          throw new Error('Deve selecionar pelo menos uma preferência');
+          addToast({
+            title: 'Erros na preferência',
+            description: 'Deve selecionar pelo menos uma preferência',
+            type: 'error',
+          });
+          toggleLoading();
+          return;
         }
 
         const dateTenYears = sub(new Date(), {
@@ -153,7 +193,9 @@ const SignUp: React.FC = () => {
         const birthDate_aux = new Date(data.birth_date);
 
         if (birthDate_aux.getFullYear() > dateTenYears.getFullYear()) {
-          throw new Error('Deve ser uma data de pelo menos 10 anos atrás');
+          throw new FormError({
+            birth_date: 'A data deve ser de pelo menos 10 anos atrás',
+          });
         }
 
         Object.assign(data, {
@@ -188,12 +230,36 @@ const SignUp: React.FC = () => {
 
         await api.post('/users', data);
         await signIn({ email: data.email, password: data.password });
+        addToast({
+          title: 'Parabéns',
+          description: 'Conta criada com sucesso',
+          type: 'success',
+        });
+        toggleLoading();
         handleImagesSubmit();
-      } catch (e) {
-        console.log(`Error: ${e}`);
+      } catch (err) {
+        toggleLoading();
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
+          formRef.current?.setErrors(errors);
+        }
+        if (err instanceof FormError) {
+          formRef.current?.setErrors(err.errors);
+        }
+        addToast({
+          title: 'Error com a criação',
+          description: 'Algo ocorreu ao criar suas conta',
+          type: 'error',
+        });
       }
     },
-    [categoriesGameSelected, signIn, handleImagesSubmit],
+    [
+      categoriesGameSelected,
+      signIn,
+      handleImagesSubmit,
+      addToast,
+      toggleLoading,
+    ],
   );
 
   const handleFileProfile = useCallback((file: File | null) => {
@@ -262,7 +328,7 @@ const SignUp: React.FC = () => {
             <FiArrowLeft />
           </Link>
         </HeaderSignup>
-        <FormSignup onSubmit={handleSubmit}>
+        <FormSignup ref={formRef} onSubmit={handleSubmit}>
           <h2>Insira suas informações abaixo</h2>
           <InputImagesArea>
             <DropImageProfileArea

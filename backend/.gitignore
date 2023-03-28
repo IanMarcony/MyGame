@@ -10,3 +10,4 @@ tmp/uploads/*
 .env
 dist/
 *.lock
+target
