@@ -64,7 +64,7 @@ export default class User {
   })
   chats: ChatUser[];
 
-  @ManyToMany(() => User, (user) => user, {
+  @ManyToMany(() => User, (user) => user.following, {
     cascade: true,
   })
   @JoinTable({ name: 'friends' })
