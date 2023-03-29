@@ -202,6 +202,13 @@ const Chat: React.FC = () => {
     [user.email],
   );
 
+  const handleVerifyMessage = useCallback(
+    (id_user_message: number) => {
+      return id_user_message === user.id;
+    },
+    [user.id],
+  );
+
   useEffect(() => {
     socket.on('message', handleMessagesListener);
     socket.on('typingResponse', handleTypingResponse);
@@ -245,7 +252,10 @@ const Chat: React.FC = () => {
         )}
         {messages.map((item, index) => (
           <>
-            <MessageCard key={item.id} isSelfMessage={item.id_user === user.id}>
+            <MessageCard
+              key={item.id}
+              isSelfMessage={handleVerifyMessage(item.id_user)}
+            >
               {item.text}
               <span>{verifyLastDateMessage(item.created_at)}</span>
             </MessageCard>
