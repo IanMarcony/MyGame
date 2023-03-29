@@ -36,6 +36,7 @@ export default class UsersRepository implements IUserRepository {
           account_game: true,
         },
         followers: true,
+        following: true,
       },
     });
 

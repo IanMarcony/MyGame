@@ -36,6 +36,20 @@ export default class ShowProfileUserService {
       delete friend.updated_at;
     }
 
+    for (const friendFollowing of user.following) {
+      delete friendFollowing.password;
+      delete friendFollowing.id;
+      delete friendFollowing.url_banner_photo;
+      delete friendFollowing.birth_date;
+      delete friendFollowing.description;
+      delete friendFollowing.created_at;
+      delete friendFollowing.updated_at;
+    }
+
+    user.followers.push(...user.following);
+
+    delete user.following;
+
     if (user.id !== id_user) {
       const isFriend = await this.friendsRepository.findFriend(
         id_user,
